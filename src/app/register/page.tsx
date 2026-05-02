@@ -243,33 +243,39 @@ export default function Register() {
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-gray-300 font-semibold mb-2">{t.register.country} *</label>
-                  <input
-                    list="countries_list"
+                  <select
                     name="country"
                     value={form.country}
                     onChange={handleInputChange}
-                    placeholder={locale === "ar" ? "ابحث عن بلد الإقامة..." : "Search Country..."}
-                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50"
-                    autoComplete="off"
-                  />
-                  <datalist id="countries_list">
-                    {(locale === "ar" ? countriesAr : countriesEn).map(c => <option key={`c-${c}`} value={c} />)}
-                  </datalist>
+                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50 appearance-none cursor-pointer"
+                  >
+                    <option value="" disabled className="bg-navy-900 text-gray-400">
+                      {locale === "ar" ? "اختر بلد الإقامة" : "Select Country"}
+                    </option>
+                    {(locale === "ar" ? countriesAr : countriesEn).map(c => (
+                      <option key={`c-${c}`} value={c} className="bg-navy-900">
+                        {c}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-gray-300 font-semibold mb-2">{t.register.nationality} *</label>
-                  <input
-                    list="nationalities_list"
+                  <select
                     name="nationality"
                     value={form.nationality}
                     onChange={handleInputChange}
-                    placeholder={locale === "ar" ? "ابحث عن الجنسية..." : "Search Nationality..."}
-                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50"
-                    autoComplete="off"
-                  />
-                  <datalist id="nationalities_list">
-                    {(locale === "ar" ? countriesAr : countriesEn).map(c => <option key={`n-${c}`} value={c} />)}
-                  </datalist>
+                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50 appearance-none cursor-pointer"
+                  >
+                    <option value="" disabled className="bg-navy-900 text-gray-400">
+                      {locale === "ar" ? "اختر الجنسية" : "Select Nationality"}
+                    </option>
+                    {(locale === "ar" ? countriesAr : countriesEn).map(c => (
+                      <option key={`n-${c}`} value={c} className="bg-navy-900">
+                        {c}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
