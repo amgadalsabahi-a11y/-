@@ -7,7 +7,9 @@ import { createToken } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const { email: rawEmail, password: rawPassword } = await req.json();
+    const email = rawEmail?.trim();
+    const password = rawPassword?.trim();
 
     if (!email || !password) {
       return NextResponse.json(

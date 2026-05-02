@@ -11,12 +11,12 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "بوابة روسيا | Russia Gateway - خدمات الدراسة والعمل والسياحة",
-  description: "بوابة روسيا - شريكك الموثوق للدراسة والعمل والسياحة وتأسيس الأعمال في روسيا. خدمات متكاملة من التقديم حتى الوصول.",
+  title: "بوابة روسيا | Russia Gateway",
+  description: "بوابة روسيا - بوابتك الأولى نحو روسيا.",
   keywords: "روسيا, دراسة, عمل, سياحة, تأشيرة, جامعات روسية, Russia, study, work, tourism",
   openGraph: {
     title: "بوابة روسيا | Russia Gateway",
-    description: "خدمات متكاملة للدراسة والعمل والسياحة في روسيا",
+    description: "بوابة روسيا - بوابتك الأولى نحو روسيا.",
     type: "website",
   },
 };

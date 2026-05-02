@@ -160,6 +160,9 @@ export default function Register() {
             <div className="text-center mb-12">
               <h1 className="text-4xl md:text-5xl font-black text-white mb-4">{t.register.title}</h1>
               <p className="text-gray-400 text-lg">{t.register.subtitle}</p>
+              <div className="mt-4 inline-block px-4 py-2 bg-brand-blue/10 border border-brand-blue/20 rounded-full text-brand-blue font-bold text-sm">
+                {locale === "ar" ? "سيتم الرد خلال من 25 إلى 40 يوم" : "Response time: 25 to 40 days"}
+              </div>
             </div>
 
             {errorMsg && (

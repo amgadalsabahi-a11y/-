@@ -25,7 +25,9 @@ export default function About() {
               subtitle: current.about_subtitle || current.subtitle,
               description: current.about_description || current.description,
               features: current.features || "",
-              about_image: current.about_image || ""
+              about_image: current.about_image || "",
+              extra_image_1: current.extra_image_1 || "",
+              extra_image_2: current.extra_image_2 || ""
             });
           } catch (e) {
             setContent({
@@ -132,6 +134,30 @@ export default function About() {
           </div>
 
         </div>
+
+        {/* ✅ الصور الإضافية - مكتملة مش جوا كرت */}
+        {(content?.extra_image_1 || content?.extra_image_2) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 mt-12 md:mt-20">
+            {content.extra_image_1 && (
+              <div className="w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/5 group">
+                <img 
+                  src={content.extra_image_1} 
+                  alt="Extra About 1" 
+                  className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" 
+                />
+              </div>
+            )}
+            {content.extra_image_2 && (
+              <div className="w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/5 group">
+                <img 
+                  src={content.extra_image_2} 
+                  alt="Extra About 2" 
+                  className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" 
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -41,8 +41,8 @@ export default function AdminDashboard() {
     title: "", subtitle: "", description: "", cta: "", image: "",
     title_color: "#ffffff", subtitle_color: "#1e50a2", description_color: "#d1d5db" 
   });
-  const [aboutAr, setAboutAr] = useState({ title: "", subtitle: "", description: "", about_image: "", features: "" });
-  const [aboutEn, setAboutEn] = useState({ title: "", subtitle: "", description: "", about_image: "", features: "" });
+  const [aboutAr, setAboutAr] = useState({ title: "", subtitle: "", description: "", about_image: "", features: "", extra_image_1: "", extra_image_2: "" });
+  const [aboutEn, setAboutEn] = useState({ title: "", subtitle: "", description: "", about_image: "", features: "", extra_image_1: "", extra_image_2: "" });
   
   const [faqs, setFaqs] = useState<any[]>([]);
   
@@ -83,8 +83,14 @@ export default function AdminDashboard() {
           title: en.hero_title || "", subtitle: en.hero_subtitle || "", description: en.hero_description || "", cta: en.hero_cta || "", image: en.hero_image || "",
           title_color: en.hero_title_color || "#ffffff", subtitle_color: en.hero_subtitle_color || "#1e50a2", description_color: en.hero_description_color || "#d1d5db"
         });
-        setAboutAr({ title: ar.about_title || "", subtitle: ar.about_subtitle || "", description: ar.about_description || "", about_image: ar.about_image || "", features: ar.features || "" });
-        setAboutEn({ title: en.about_title || "", subtitle: en.about_subtitle || "", description: en.about_description || "", about_image: en.about_image || "", features: en.features || "" });
+        setAboutAr({ 
+          title: ar.about_title || "", subtitle: ar.about_subtitle || "", description: ar.about_description || "", about_image: ar.about_image || "", features: ar.features || "",
+          extra_image_1: ar.extra_image_1 || "", extra_image_2: ar.extra_image_2 || ""
+        });
+        setAboutEn({ 
+          title: en.about_title || "", subtitle: en.about_subtitle || "", description: en.about_description || "", about_image: en.about_image || "", features: en.features || "",
+          extra_image_1: en.extra_image_1 || "", extra_image_2: en.extra_image_2 || ""
+        });
       } else if (type === "faqs") {
         setFaqs(data || []);
       }
@@ -115,12 +121,14 @@ export default function AdminDashboard() {
       about_ar: JSON.stringify({
         hero_title: heroAr.title, hero_subtitle: heroAr.subtitle, hero_description: heroAr.description, hero_cta: heroAr.cta, hero_image: heroAr.image,
         hero_title_color: heroAr.title_color, hero_subtitle_color: heroAr.subtitle_color, hero_description_color: heroAr.description_color,
-        about_title: aboutAr.title, about_subtitle: aboutAr.subtitle, about_description: aboutAr.description, about_image: aboutAr.about_image, features: aboutAr.features
+        about_title: aboutAr.title, about_subtitle: aboutAr.subtitle, about_description: aboutAr.description, about_image: aboutAr.about_image, features: aboutAr.features,
+        extra_image_1: aboutAr.extra_image_1, extra_image_2: aboutAr.extra_image_2
       }),
       about_en: JSON.stringify({
         hero_title: heroEn.title, hero_subtitle: heroEn.subtitle, hero_description: heroEn.description, hero_cta: heroEn.cta, hero_image: heroEn.image,
         hero_title_color: heroEn.title_color, hero_subtitle_color: heroEn.subtitle_color, hero_description_color: heroEn.description_color,
-        about_title: aboutEn.title, about_subtitle: aboutEn.subtitle, about_description: aboutEn.description, about_image: aboutEn.about_image, features: aboutEn.features
+        about_title: aboutEn.title, about_subtitle: aboutEn.subtitle, about_description: aboutEn.description, about_image: aboutEn.about_image, features: aboutEn.features,
+        extra_image_1: aboutEn.extra_image_1, extra_image_2: aboutEn.extra_image_2
       })
     };
     await fetch("/api/admin/content", { method: "POST", body: JSON.stringify({ type: "settings", payload }) });
@@ -152,7 +160,33 @@ export default function AdminDashboard() {
         alert("فشل الرفع: " + (data.error || ""));
       }
     } catch (err) { alert("خطأ في الرفع"); }
-    finally { if (target === 'hero') setUploadingImage(false); else setUploadingAboutImage(false); }
+    finally { 
+      if (target === 'hero') setUploadingImage(false); 
+      else setUploadingAboutImage(false); 
+    }
+  };
+
+  const handleExtraImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, num: 1 | 2) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.url) {
+        if (num === 1) {
+          setAboutAr(prev => ({ ...prev, extra_image_1: data.url }));
+          setAboutEn(prev => ({ ...prev, extra_image_1: data.url }));
+        } else {
+          setAboutAr(prev => ({ ...prev, extra_image_2: data.url }));
+          setAboutEn(prev => ({ ...prev, extra_image_2: data.url }));
+        }
+        alert("تم رفع الصورة بنجاح");
+      }
+    } catch (err) { alert("خطأ في الرفع"); }
   };
 
   const saveFaq = async () => {
@@ -491,6 +525,43 @@ export default function AdminDashboard() {
                   </label>
                 </div>
               </div>
+
+              {/* ✅ الصور الإضافية لأسفل قسم من نحن */}
+              {tab === 'about' && (
+                <div className="mt-12 pt-8 border-t border-white/10">
+                  <h3 className="text-lg font-bold text-brand-blue mb-6">صور إضافية لأسفل القسم (مكتملة)</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                      <div className="w-full h-40 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center mb-4">
+                        {aboutAr.extra_image_1 ? (
+                          <img src={aboutAr.extra_image_1} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-gray-500 text-xs">الصورة 1</span>
+                        )}
+                      </div>
+                      <label className="btn-secondary !py-2 !px-4 cursor-pointer flex items-center justify-center gap-2 w-full text-sm">
+                        <Upload size={16} />
+                        رفع الصورة 1
+                        <input type="file" className="hidden" onChange={e => handleExtraImageUpload(e, 1)} />
+                      </label>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="w-full h-40 rounded-2xl bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center mb-4">
+                        {aboutAr.extra_image_2 ? (
+                          <img src={aboutAr.extra_image_2} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-gray-500 text-xs">الصورة 2</span>
+                        )}
+                      </div>
+                      <label className="btn-secondary !py-2 !px-4 cursor-pointer flex items-center justify-center gap-2 w-full text-sm">
+                        <Upload size={16} />
+                        رفع الصورة 2
+                        <input type="file" className="hidden" onChange={e => handleExtraImageUpload(e, 2)} />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
