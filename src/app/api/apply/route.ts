@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
     const notes = formData.get("notes") as string || null;
     const file = formData.get("file") as File | null;
 
+    // ✅ تحقق من الحقول المطلوبة
     if (!full_name || !phone) {
       return NextResponse.json(
         { error: "الاسم ورقم الهاتف مطلوبان" },
@@ -25,8 +26,32 @@ export async function POST(req: NextRequest) {
 
     let file_url: string | null = null;
 
-    // Upload file to Supabase Storage if provided
     if (file && file.size > 0) {
+      // ✅ إصلاح أمني: تحقق من نوع الملف في السيرفر (وليس فقط العميل)
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+        "image/heic",
+        "application/pdf",
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        return NextResponse.json(
+          { error: "نوع الملف غير مسموح. يُرجى رفع صورة (JPG, PNG, WEBP) أو PDF فقط" },
+          { status: 400 }
+        );
+      }
+
+      // ✅ تحقق من حجم الملف في السيرفر أيضاً
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        return NextResponse.json(
+          { error: "حجم الملف كبير جداً. الأقصى 10 ميجابايت" },
+          { status: 400 }
+        );
+      }
+
       const fileExt = file.name.split(".").pop();
       const fileName = `${uuidv4()}.${fileExt}`;
 
@@ -47,15 +72,16 @@ export async function POST(req: NextRequest) {
             .getPublicUrl(fileName);
           file_url = urlData.publicUrl;
         } else {
+          // ✅ لا نكشف تفاصيل الخطأ الداخلية للمستخدم
           console.error("Upload error:", uploadError);
-          return NextResponse.json({ error: "فشل رفع الملف: " + uploadError.message }, { status: 500 });
+          return NextResponse.json({ error: "فشل رفع الملف، يرجى المحاولة مرة أخرى" }, { status: 500 });
         }
       } catch (e: any) {
-        return NextResponse.json({ error: "خطأ في معالجة الملف: " + e.message }, { status: 500 });
+        console.error("File processing error:", e);
+        return NextResponse.json({ error: "خطأ في معالجة الملف، يرجى المحاولة مرة أخرى" }, { status: 500 });
       }
     }
 
-    // Insert application into database
     const { error: insertError } = await supabaseAdmin
       .from("users_applications")
       .insert({
@@ -72,8 +98,9 @@ export async function POST(req: NextRequest) {
       });
 
     if (insertError) {
+      // ✅ لا نكشف تفاصيل قاعدة البيانات للمستخدم
       console.error("Supabase insert error:", insertError);
-      return NextResponse.json({ error: "فشل حفظ البيانات: " + insertError.message }, { status: 500 });
+      return NextResponse.json({ error: "فشل حفظ البيانات، يرجى المحاولة مرة أخرى" }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -83,7 +110,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error("Apply API error:", error);
     return NextResponse.json(
-      { error: "خطأ غير متوقع: " + error.message },
+      { error: "حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى" },
       { status: 500 }
     );
   }

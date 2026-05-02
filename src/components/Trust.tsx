@@ -11,9 +11,10 @@ export default function Trust() {
   const t = getTranslations(locale);
 
   return (
-    <section className="relative py-32">
+    // ✅ إصلاح: py-16 للجوال بدل py-32
+    <section className="relative py-16 md:py-32 overflow-hidden">
       <div className="section-container">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-5xl font-black text-white mb-6">
             {t.trust.title}
           </h2>

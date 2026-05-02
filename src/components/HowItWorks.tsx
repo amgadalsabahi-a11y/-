@@ -11,9 +11,10 @@ export default function HowItWorks() {
   const t = getTranslations(locale);
 
   return (
-    <section id="how-it-works" className="relative py-32">
+    // ✅ إصلاح: py-16 للجوال بدل py-32 — كان 128px فوق وتحت على الشاشة الصغيرة
+    <section id="how-it-works" className="relative py-16 md:py-32 overflow-hidden">
       <div className="section-container">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-5xl font-black text-white mb-6">
             {t.howItWorks.title}
           </h2>
@@ -22,7 +23,7 @@ export default function HowItWorks() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 relative">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 relative">
           {/* Connecting line - desktop only */}
           <div className="hidden md:block absolute top-24 start-[16%] end-[16%] h-[2px] bg-gradient-to-r from-transparent via-brand-blue/30 to-transparent" />
 
@@ -31,7 +32,7 @@ export default function HowItWorks() {
             return (
               <div key={i} className="relative text-center group">
                 {/* Step number circle */}
-                <div className="relative inline-flex items-center justify-center mb-8">
+                <div className="relative inline-flex items-center justify-center mb-6 md:mb-8">
                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-brand-blue to-brand-blue/60 flex items-center justify-center shadow-lg shadow-brand-blue/25 group-hover:scale-110 transition-transform duration-300 relative z-10">
                     <Icon size={32} className="text-white" />
                   </div>

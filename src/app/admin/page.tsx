@@ -30,10 +30,17 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState("apps");
   const [loadingApps, setLoadingApps] = useState(true);
   const [applications, setApplications] = useState<any[]>([]);
-  
+  const [appFilter, setAppFilter] = useState("الكل");
+  const [selectedApp, setSelectedApp] = useState<any | null>(null);
   // Settings State
-  const [heroAr, setHeroAr] = useState({ title: "", subtitle: "", description: "", cta: "", image: "" });
-  const [heroEn, setHeroEn] = useState({ title: "", subtitle: "", description: "", cta: "", image: "" });
+  const [heroAr, setHeroAr] = useState({ 
+    title: "", subtitle: "", description: "", cta: "", image: "",
+    title_color: "#ffffff", subtitle_color: "#1e50a2", description_color: "#d1d5db" 
+  });
+  const [heroEn, setHeroEn] = useState({ 
+    title: "", subtitle: "", description: "", cta: "", image: "",
+    title_color: "#ffffff", subtitle_color: "#1e50a2", description_color: "#d1d5db" 
+  });
   const [aboutAr, setAboutAr] = useState({ title: "", subtitle: "", description: "", about_image: "", features: "" });
   const [aboutEn, setAboutEn] = useState({ title: "", subtitle: "", description: "", about_image: "", features: "" });
   
@@ -73,8 +80,14 @@ export default function AdminDashboard() {
       if (type === "settings" && data) {
         const ar = JSON.parse(data.about_ar || "{}");
         const en = JSON.parse(data.about_en || "{}");
-        setHeroAr({ title: ar.hero_title || "", subtitle: ar.hero_subtitle || "", description: ar.hero_description || "", cta: ar.hero_cta || "", image: ar.hero_image || "" });
-        setHeroEn({ title: en.hero_title || "", subtitle: en.hero_subtitle || "", description: en.hero_description || "", cta: en.hero_cta || "", image: en.hero_image || "" });
+        setHeroAr({ 
+          title: ar.hero_title || "", subtitle: ar.hero_subtitle || "", description: ar.hero_description || "", cta: ar.hero_cta || "", image: ar.hero_image || "",
+          title_color: ar.hero_title_color || "#ffffff", subtitle_color: ar.hero_subtitle_color || "#1e50a2", description_color: ar.hero_description_color || "#d1d5db"
+        });
+        setHeroEn({ 
+          title: en.hero_title || "", subtitle: en.hero_subtitle || "", description: en.hero_description || "", cta: en.hero_cta || "", image: en.hero_image || "",
+          title_color: en.hero_title_color || "#ffffff", subtitle_color: en.hero_subtitle_color || "#1e50a2", description_color: en.hero_description_color || "#d1d5db"
+        });
         setAboutAr({ title: ar.about_title || "", subtitle: ar.about_subtitle || "", description: ar.about_description || "", about_image: ar.about_image || "", features: ar.features || "" });
         setAboutEn({ title: en.about_title || "", subtitle: en.about_subtitle || "", description: en.about_description || "", about_image: en.about_image || "", features: en.features || "" });
       } else if (type === "faqs") {
@@ -108,10 +121,12 @@ export default function AdminDashboard() {
     const payload = {
       about_ar: JSON.stringify({
         hero_title: heroAr.title, hero_subtitle: heroAr.subtitle, hero_description: heroAr.description, hero_cta: heroAr.cta, hero_image: heroAr.image,
+        hero_title_color: heroAr.title_color, hero_subtitle_color: heroAr.subtitle_color, hero_description_color: heroAr.description_color,
         about_title: aboutAr.title, about_subtitle: aboutAr.subtitle, about_description: aboutAr.description, about_image: aboutAr.about_image, features: aboutAr.features
       }),
       about_en: JSON.stringify({
         hero_title: heroEn.title, hero_subtitle: heroEn.subtitle, hero_description: heroEn.description, hero_cta: heroEn.cta, hero_image: heroEn.image,
+        hero_title_color: heroEn.title_color, hero_subtitle_color: heroEn.subtitle_color, hero_description_color: heroEn.description_color,
         about_title: aboutEn.title, about_subtitle: aboutEn.subtitle, about_description: aboutEn.description, about_image: aboutEn.about_image, features: aboutEn.features
       })
     };
@@ -232,34 +247,78 @@ export default function AdminDashboard() {
             </div>
 
             <div className="glass-card-static rounded-2xl overflow-hidden border border-white/5">
-              <div className="p-6 border-b border-white/5 bg-white/5 flex items-center justify-between">
+              <div className="p-6 border-b border-white/5 bg-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h2 className="text-xl font-bold text-white flex items-center gap-3">
                   <Users className="text-brand-blue" />
                   قائمة الطلبات
                 </h2>
+                <div className="flex bg-navy-900 rounded-lg p-1 border border-white/10 w-fit">
+                  {["الكل", "جديد", "تم التواصل", "مرفوض"].map(status => (
+                    <button
+                      key={status}
+                      onClick={() => setAppFilter(status)}
+                      className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${appFilter === status ? "bg-brand-blue text-white shadow" : "text-gray-400 hover:text-white"}`}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-start">
                   <thead className="bg-white/5 text-gray-400 border-b border-white/5">
                     <tr>
-                      <th className="px-6 py-4 text-start font-semibold">الاسم</th>
-                      <th className="px-6 py-4 text-start font-semibold">الهاتف</th>
-                      <th className="px-6 py-4 text-start font-semibold">البلد</th>
-                      <th className="px-6 py-4 text-start font-semibold">جواز السفر</th>
-                      <th className="px-6 py-4 text-start font-semibold">الحالة</th>
-                      <th className="px-6 py-4 text-center font-semibold">حذف</th>
+                      <th className="px-4 py-4 text-start font-semibold">الاسم</th>
+                      <th className="px-4 py-4 text-start font-semibold">العمر</th>
+                      <th className="px-4 py-4 text-start font-semibold">الهاتف</th>
+                      <th className="px-4 py-4 text-start font-semibold">البلد والجنسية</th>
+                      <th className="px-4 py-4 text-start font-semibold">ملاحظات</th>
+                      <th className="px-4 py-4 text-start font-semibold">تاريخ الإقامة</th>
+                      <th className="px-4 py-4 text-start font-semibold">جواز السفر</th>
+                      <th className="px-4 py-4 text-start font-semibold">الحالة</th>
+                      <th className="px-4 py-4 text-center font-semibold">حذف</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {applications.map(app => (
-                      <tr key={app.id} className="hover:bg-white/5 transition-colors">
-                        <td className="px-6 py-4 font-bold text-white">{app.full_name}</td>
-                        <td className="px-6 py-4 text-gray-300" dir="ltr">{app.phone}</td>
-                        <td className="px-6 py-4 text-gray-300">{app.country}</td>
-                        <td className="px-6 py-4 text-gray-400">{app.residency_expiry || "-"}</td>
-                        <td className="px-6 py-4">
+                    {(appFilter === "الكل" ? applications : applications.filter(a => a.status === appFilter)).map(app => (
+                      <tr 
+                        key={app.id} 
+                        className="hover:bg-white/5 transition-colors text-sm cursor-pointer"
+                        onClick={() => setSelectedApp(app)}
+                      >
+                        <td className="px-4 py-4 font-bold text-white">{app.full_name}</td>
+                        <td className="px-4 py-4 text-gray-300">{app.age || "-"}</td>
+                        <td className="px-4 py-4 text-gray-300 whitespace-nowrap" dir="ltr">
+                          <div className="flex items-center gap-2">
+                            <span>{app.phone}</span>
+                            <a 
+                              href={`https://wa.me/${app.phone.replace(/[^0-9+]/g, '')}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-green-500 hover:bg-green-500/10 p-1.5 rounded-md transition-all"
+                              title="مراسلة واتساب"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                            </a>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 text-gray-300">
+                          <div className="flex flex-col">
+                            <span>{app.country}</span>
+                            <span className="text-xs text-gray-500">{app.nationality}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 text-gray-300 max-w-[150px] truncate" title={app.notes}>{app.notes || "-"}</td>
+                        <td className="px-4 py-4 text-gray-400">{app.residency_expiry || "-"}</td>
+                        <td className="px-4 py-4">
                           {app.file_url ? (
-                            <a href={app.file_url} target="_blank" className="text-brand-blue hover:underline font-bold flex items-center gap-1">
+                            <a 
+                              href={app.file_url} 
+                              target="_blank" 
+                              className="text-brand-blue hover:underline font-bold flex items-center gap-1"
+                              onClick={(e) => e.stopPropagation()}
+                            >
                               <Layout size={14} /> عرض
                             </a>
                           ) : "-"}
@@ -268,6 +327,7 @@ export default function AdminDashboard() {
                           <select 
                             value={app.status} 
                             onChange={(e) => updateStatus(app.id, e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
                             className="bg-navy-900 border border-white/10 text-xs rounded-lg px-3 py-1.5 focus:border-brand-blue transition-all"
                           >
                             <option value="جديد">جديد</option>
@@ -276,7 +336,10 @@ export default function AdminDashboard() {
                           </select>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <button onClick={() => deleteApplication(app.id)} className="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-all">
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); deleteApplication(app.id); }} 
+                            className="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-all"
+                          >
                             <Trash2 size={18} />
                           </button>
                         </td>
@@ -309,17 +372,35 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-bold text-brand-blue border-b border-white/10 pb-2">المحتوى العربي</h3>
                   {tab === "hero" ? (
                     <>
-                      <div>
-                        <label className="block text-gray-400 text-sm mb-2">العنوان الرئيسي</label>
-                        <input value={heroAr.title} onChange={e => setHeroAr({...heroAr, title: e.target.value})} className="glass-input w-full p-4" />
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1">
+                          <label className="block text-gray-400 text-sm mb-2">العنوان الرئيسي</label>
+                          <input value={heroAr.title} onChange={e => setHeroAr({...heroAr, title: e.target.value})} className="glass-input w-full p-4" />
+                        </div>
+                        <div className="w-full sm:w-24">
+                          <label className="block text-gray-400 text-sm mb-2">اللون</label>
+                          <input type="color" value={heroAr.title_color} onChange={e => setHeroAr({...heroAr, title_color: e.target.value})} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-gray-400 text-sm mb-2">العنوان الفرعي</label>
-                        <input value={heroAr.subtitle} onChange={e => setHeroAr({...heroAr, subtitle: e.target.value})} className="glass-input w-full p-4" />
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1">
+                          <label className="block text-gray-400 text-sm mb-2">العنوان الفرعي</label>
+                          <input value={heroAr.subtitle} onChange={e => setHeroAr({...heroAr, subtitle: e.target.value})} className="glass-input w-full p-4" />
+                        </div>
+                        <div className="w-full sm:w-24">
+                          <label className="block text-gray-400 text-sm mb-2">اللون</label>
+                          <input type="color" value={heroAr.subtitle_color} onChange={e => setHeroAr({...heroAr, subtitle_color: e.target.value})} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-gray-400 text-sm mb-2">الوصف</label>
-                        <textarea value={heroAr.description} onChange={e => setHeroAr({...heroAr, description: e.target.value})} className="glass-input w-full p-4 h-32" />
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1">
+                          <label className="block text-gray-400 text-sm mb-2">الوصف</label>
+                          <textarea value={heroAr.description} onChange={e => setHeroAr({...heroAr, description: e.target.value})} className="glass-input w-full p-4 h-32" />
+                        </div>
+                        <div className="w-full sm:w-24">
+                          <label className="block text-gray-400 text-sm mb-2">اللون</label>
+                          <input type="color" value={heroAr.description_color} onChange={e => setHeroAr({...heroAr, description_color: e.target.value})} className="glass-input w-full h-full p-1 cursor-pointer min-h-[58px]" />
+                        </div>
                       </div>
                       <div>
                         <label className="block text-gray-400 text-sm mb-2">نص الزر (CTA)</label>
@@ -353,17 +434,35 @@ export default function AdminDashboard() {
                   <h3 className="text-lg font-bold text-brand-red border-b border-white/10 pb-2">English Content</h3>
                   {tab === "hero" ? (
                     <>
-                      <div>
-                        <label className="block text-gray-500 text-sm mb-2">Main Title</label>
-                        <input value={heroEn.title} onChange={e => setHeroEn({...heroEn, title: e.target.value})} className="glass-input w-full p-4" />
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1">
+                          <label className="block text-gray-500 text-sm mb-2">Main Title</label>
+                          <input value={heroEn.title} onChange={e => setHeroEn({...heroEn, title: e.target.value})} className="glass-input w-full p-4" />
+                        </div>
+                        <div className="w-full sm:w-24">
+                          <label className="block text-gray-500 text-sm mb-2">Color</label>
+                          <input type="color" value={heroEn.title_color} onChange={e => setHeroEn({...heroEn, title_color: e.target.value})} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-gray-500 text-sm mb-2">Subtitle</label>
-                        <input value={heroEn.subtitle} onChange={e => setHeroEn({...heroEn, subtitle: e.target.value})} className="glass-input w-full p-4" />
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1">
+                          <label className="block text-gray-500 text-sm mb-2">Subtitle</label>
+                          <input value={heroEn.subtitle} onChange={e => setHeroEn({...heroEn, subtitle: e.target.value})} className="glass-input w-full p-4" />
+                        </div>
+                        <div className="w-full sm:w-24">
+                          <label className="block text-gray-500 text-sm mb-2">Color</label>
+                          <input type="color" value={heroEn.subtitle_color} onChange={e => setHeroEn({...heroEn, subtitle_color: e.target.value})} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-gray-500 text-sm mb-2">Description</label>
-                        <textarea value={heroEn.description} onChange={e => setHeroEn({...heroEn, description: e.target.value})} className="glass-input w-full p-4 h-32" />
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex-1">
+                          <label className="block text-gray-500 text-sm mb-2">Description</label>
+                          <textarea value={heroEn.description} onChange={e => setHeroEn({...heroEn, description: e.target.value})} className="glass-input w-full p-4 h-32" />
+                        </div>
+                        <div className="w-full sm:w-24">
+                          <label className="block text-gray-500 text-sm mb-2">Color</label>
+                          <input type="color" value={heroEn.description_color} onChange={e => setHeroEn({...heroEn, description_color: e.target.value})} className="glass-input w-full h-full p-1 cursor-pointer min-h-[58px]" />
+                        </div>
                       </div>
                       <div>
                         <label className="block text-gray-500 text-sm mb-2">Button Text (CTA)</label>
@@ -537,6 +636,81 @@ export default function AdminDashboard() {
           </div>
         )}
       </main>
+
+      {/* Selected Application Modal */}
+      {selectedApp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedApp(null)}>
+          <div className="bg-navy-900 border border-white/10 p-6 md:p-8 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative" onClick={e => e.stopPropagation()}>
+            <button 
+              onClick={() => setSelectedApp(null)}
+              className="absolute top-4 left-4 p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+            >
+              <X size={24} />
+            </button>
+            
+            <h3 className="text-2xl font-bold text-white mb-6 border-b border-white/5 pb-4 pr-10">
+              تفاصيل طلب: {selectedApp.full_name}
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <p className="text-gray-400 text-sm mb-1">الاسم الكامل</p>
+                <p className="text-white font-medium text-lg">{selectedApp.full_name}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm mb-1">العمر</p>
+                <p className="text-white font-medium text-lg">{selectedApp.age || "غير محدد"}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm mb-1">الهاتف</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-white font-medium text-lg" dir="ltr">{selectedApp.phone}</p>
+                  <a 
+                    href={`https://wa.me/${selectedApp.phone.replace(/[^0-9+]/g, '')}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-green-500 hover:bg-green-500/10 p-1 rounded-md transition-all"
+                    title="مراسلة واتساب"
+                  >
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                  </a>
+                </div>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm mb-1">البلد</p>
+                <p className="text-white font-medium text-lg">{selectedApp.country}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm mb-1">الجنسية</p>
+                <p className="text-white font-medium text-lg">{selectedApp.nationality}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm mb-1">تاريخ الإقامة (للمقيمين بالسعودية)</p>
+                <p className="text-white font-medium text-lg">{selectedApp.residency_expiry || "غير محدد"}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-gray-400 text-sm mb-1">تاريخ التقديم</p>
+                <p className="text-white font-medium text-lg" dir="ltr">{new Date(selectedApp.created_at).toLocaleString('ar-EG')}</p>
+              </div>
+              <div className="md:col-span-2 bg-white/5 p-4 rounded-xl border border-white/5">
+                <p className="text-gray-400 text-sm mb-2">الملاحظات</p>
+                <p className="text-white whitespace-pre-wrap">{selectedApp.notes || "لا توجد ملاحظات"}</p>
+              </div>
+              {selectedApp.file_url && (
+                <div className="md:col-span-2">
+                  <a 
+                    href={selectedApp.file_url} 
+                    target="_blank" 
+                    className="btn-primary w-full flex items-center justify-center gap-2 !py-4"
+                  >
+                    <Layout size={20} /> عرض صورة الجواز المرفقة
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

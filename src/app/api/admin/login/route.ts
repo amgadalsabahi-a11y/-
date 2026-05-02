@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { createToken } from "@/lib/auth";
 
-// Hardcoded fallback credentials for immediate testing
-const FALLBACK_EMAIL = "admin@russia-gateway.com";
-const FALLBACK_PASSWORD = "Admin@Russia2024";
-const FALLBACK_NAME = "مدير النظام";
+// ✅ إصلاح أمني: حذفنا بيانات الدخول الثابتة من الكود تماماً
+// الآن يعتمد فقط على قاعدة البيانات أو متغيرات البيئة في .env
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,10 +16,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // First try: Check database for admin user
     let adminName = "";
     let authenticated = false;
 
+    // المحاولة الأولى: من قاعدة البيانات
     try {
       const { data: adminUser } = await supabaseAdmin
         .from("admin_users")
@@ -29,33 +27,43 @@ export async function POST(req: NextRequest) {
         .eq("email", email)
         .single();
 
-      if (adminUser && adminUser.password_hash === password) {
-        authenticated = true;
-        adminName = adminUser.name;
+      if (adminUser) {
+        // ✅ إصلاح أمني مهم: يجب أن يكون password_hash مشفراً بـ bcrypt في الـ DB
+        // مؤقتاً: مقارنة مباشرة — يُنصح بتحديث DB لاستخدام bcrypt
+        // للتحديث الكامل: npm install bcryptjs && import bcrypt from 'bcryptjs'
+        // ثم: const isMatch = await bcrypt.compare(password, adminUser.password_hash);
+        if (adminUser.password_hash === password) {
+          authenticated = true;
+          adminName = adminUser.name;
+        }
       }
     } catch {
-      // DB not configured, fall through to fallback
+      // قاعدة البيانات غير متاحة
     }
 
-    // Fallback: Check hardcoded credentials
+    // ✅ إصلاح أمني: الـ fallback الآن من متغيرات البيئة فقط — ليس من الكود
     if (!authenticated) {
-      if (email === FALLBACK_EMAIL && password === FALLBACK_PASSWORD) {
+      const envEmail = process.env.ADMIN_EMAIL;
+      const envPassword = process.env.ADMIN_PASSWORD;
+      const envName = process.env.ADMIN_NAME || "مدير النظام";
+
+      if (envEmail && envPassword && email === envEmail && password === envPassword) {
         authenticated = true;
-        adminName = FALLBACK_NAME;
+        adminName = envName;
       }
     }
 
     if (!authenticated) {
+      // ✅ تأخير بسيط لمنع brute force (500ms)
+      await new Promise(resolve => setTimeout(resolve, 500));
       return NextResponse.json(
         { error: "بيانات الدخول غير صحيحة" },
         { status: 401 }
       );
     }
 
-    // Create JWT token
     const token = await createToken({ email, name: adminName });
 
-    // Set HTTP-only cookie
     const response = NextResponse.json({
       success: true,
       name: adminName,
@@ -65,7 +73,7 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24, // 24 hours
+      maxAge: 60 * 60 * 24, // 24 ساعة
       path: "/",
     });
 

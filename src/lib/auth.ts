@@ -1,8 +1,12 @@
 import { SignJWT, jwtVerify } from "jose";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "russia-gateway-super-secret-key-2024"
-);
+// ✅ إصلاح أمني: لا fallback في الكود — يجب أن يكون JWT_SECRET في ملف .env
+// إذا لم يكن موجوداً سيرمي خطأ ويوقف التطبيق (أفضل من مفتاح ضعيف مكشوف)
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET غير موجود في متغيرات البيئة. أضفه في ملف .env");
+}
+
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function createToken(payload: { email: string; name: string }) {
   return await new SignJWT(payload)

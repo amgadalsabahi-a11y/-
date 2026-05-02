@@ -53,17 +53,7 @@ export const translations = {
         { number: "10+", label: "سنوات خبرة" },
       ],
     },
-    // Services
-    services: {
-      title: "خدماتنا",
-      subtitle: "حلول متكاملة تناسب جميع احتياجاتك",
-      items: [
-        { title: "الدراسة في روسيا", description: "قبولات جامعية في أفضل الجامعات الروسية مع منح دراسية. نساعدك في اختيار التخصص المناسب وإتمام جميع إجراءات القبول والتأشيرة.", icon: "GraduationCap" },
-        { title: "فرص العمل", description: "نوفر فرص عمل مميزة في مختلف القطاعات داخل روسيا. نساعدك في إعداد السيرة الذاتية والتقديم والحصول على تصريح العمل.", icon: "Briefcase" },
-        { title: "السياحة", description: "باقات سياحية مميزة لاكتشاف جمال روسيا. من موسكو إلى سانت بطرسبرغ، نخطط لرحلتك المثالية بكل التفاصيل.", icon: "Plane" },
-        { title: "تأسيس الأعمال", description: "نساعدك في تأسيس شركتك في روسيا مع جميع الإجراءات القانونية والتراخيص اللازمة وفتح الحسابات البنكية.", icon: "Building2" },
-      ],
-    },
+
     // How It Works
     howItWorks: {
       title: "كيف نعمل؟",
@@ -82,7 +72,7 @@ export const translations = {
     // Footer
     footer: {
       brand: "بوابة روسيا",
-      description: "شريكك الموثوق لبدء رحلتك نحو روسيا. خدمات متكاملة من المعاملة للطيران للاستقبال.",
+      description: "",
       quickLinks: "روابط سريعة",
       contactUs: "تواصل معنا",
       followUs: "تابعنا",
@@ -190,16 +180,7 @@ export const translations = {
         { number: "10+", label: "Years Experience" },
       ],
     },
-    services: {
-      title: "Our Services",
-      subtitle: "Comprehensive solutions for all your needs",
-      items: [
-        { title: "Study in Russia", description: "University admissions at the best Russian universities with scholarships. We help you choose the right specialization and complete all admission and visa procedures.", icon: "GraduationCap" },
-        { title: "Work Opportunities", description: "We provide outstanding work opportunities in various sectors within Russia. We help you prepare your CV, apply, and obtain a work permit.", icon: "Briefcase" },
-        { title: "Tourism", description: "Premium tourism packages to discover Russia's beauty. From Moscow to St. Petersburg, we plan your perfect trip with every detail.", icon: "Plane" },
-        { title: "Business Establishment", description: "We help you establish your company in Russia with all necessary legal procedures, licenses, and bank account opening.", icon: "Building2" },
-      ],
-    },
+
     howItWorks: {
       title: "How It Works?",
       subtitle: "Three simple steps to get started",
@@ -215,7 +196,7 @@ export const translations = {
     },
     footer: {
       brand: "Russia Gateway",
-      description: "Your trusted partner to start your journey to Russia. Integrated services from processing to flight to reception.",
+      description: "",
       quickLinks: "Quick Links",
       contactUs: "Contact Us",
       followUs: "Follow Us",
