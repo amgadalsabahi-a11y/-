@@ -67,6 +67,7 @@ export default function Register() {
     notes: ""
   });
   const [dialCode, setDialCode] = useState("+966");
+  const [whatsappDialCode, setWhatsappDialCode] = useState("+966");
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
 
@@ -138,7 +139,7 @@ export default function Register() {
       formData.append("country", form.country);
       formData.append("nationality", form.nationality);
       formData.append("phone", dialCode + " " + form.phone);
-      formData.append("whatsapp_number", form.whatsapp_number || "");
+      formData.append("whatsapp_number", whatsappDialCode + " " + form.whatsapp_number);
       formData.append("notes", form.notes || "");
       formData.append("file", file);
       formData.append("has_saudi_residency", isSaudi ? "true" : "false");
@@ -306,15 +307,33 @@ export default function Register() {
                 </div>
                 <div>
                   <label className="block text-gray-300 font-semibold mb-2">{(t.register as any).whatsapp} *</label>
-                  <input
-                    type="tel"
-                    name="whatsapp_number"
-                    value={form.whatsapp_number}
-                    onChange={handleInputChange}
-                    dir="ltr"
-                    className="glass-input w-full px-5 py-4"
-                    placeholder="9665xxxxxxxx"
-                  />
+                  <div className="flex flex-row gap-2">
+                    <div className="relative w-24 sm:w-28 shrink-0">
+                      <input
+                        list="whatsapp_dial_codes_list"
+                        value={whatsappDialCode}
+                        onChange={(e) => setWhatsappDialCode(e.target.value)}
+                        placeholder="+966"
+                        className="glass-input w-full px-3 py-4 text-center"
+                      />
+                      <datalist id="whatsapp_dial_codes_list">
+                        {dialCodes.map(c => (
+                          <option key={`wa-${c.code}`} value={c.code}>
+                            {c.flag} {c.name}
+                          </option>
+                        ))}
+                      </datalist>
+                    </div>
+                    <input
+                      type="tel"
+                      name="whatsapp_number"
+                      value={form.whatsapp_number}
+                      onChange={handleInputChange}
+                      dir="ltr"
+                      className="glass-input flex-1 px-4 py-4 min-w-0"
+                      placeholder="5xxxxxxx"
+                    />
+                  </div>
                 </div>
               </div>
 
