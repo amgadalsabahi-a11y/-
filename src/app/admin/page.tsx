@@ -282,6 +282,7 @@ export default function AdminDashboard() {
                       <th className="px-4 py-4 text-start font-semibold">الاسم</th>
                       <th className="px-4 py-4 text-start font-semibold">العمر</th>
                       <th className="px-4 py-4 text-start font-semibold">الهاتف</th>
+                      <th className="px-4 py-4 text-start font-semibold">الواتساب</th>
                       <th className="px-4 py-4 text-start font-semibold">البلد والجنسية</th>
                       <th className="px-4 py-4 text-start font-semibold">ملاحظات</th>
                       <th className="px-4 py-4 text-start font-semibold">تاريخ الإقامة</th>
@@ -299,20 +300,23 @@ export default function AdminDashboard() {
                       >
                         <td className="px-4 py-4 font-bold text-white">{app.full_name}</td>
                         <td className="px-4 py-4 text-gray-300">{app.age || "-"}</td>
-                        <td className="px-4 py-4 text-gray-300 whitespace-nowrap" dir="ltr">
-                          <div className="flex items-center gap-2">
-                            <span>{app.phone}</span>
-                            <a 
-                              href={`https://wa.me/${app.phone.replace(/[^0-9+]/g, '')}`} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-green-500 hover:bg-green-500/10 p-1.5 rounded-md transition-all"
-                              title="مراسلة واتساب"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                            </a>
-                          </div>
+                        <td className="px-4 py-4 text-gray-300 whitespace-nowrap" dir="ltr">{app.phone}</td>
+                        <td className="px-4 py-4 text-gray-300">
+                          {app.whatsapp_number ? (
+                            <div className="flex items-center gap-2">
+                              <span dir="ltr" className="text-xs">{app.whatsapp_number}</span>
+                              <a 
+                                href={`https://wa.me/${app.whatsapp_number.replace(/[^0-9]/g, '')}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-green-500 hover:bg-green-500/10 p-1.5 rounded-md transition-all shrink-0"
+                                title="مراسلة واتساب"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                              </a>
+                            </div>
+                          ) : "-"}
                         </td>
                         <td className="px-4 py-4 text-gray-300">
                           <div className="flex flex-col">
@@ -653,17 +657,23 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <p className="text-gray-400 text-sm mb-1">الهاتف</p>
+                <p className="text-white font-medium text-lg" dir="ltr">{selectedApp.phone}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm mb-1">الواتساب</p>
                 <div className="flex items-center gap-2">
-                  <p className="text-white font-medium text-lg" dir="ltr">{selectedApp.phone}</p>
-                  <a 
-                    href={`https://wa.me/${selectedApp.phone.replace(/[^0-9+]/g, '')}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-green-500 hover:bg-green-500/10 p-1 rounded-md transition-all"
-                    title="مراسلة واتساب"
-                  >
-                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                  </a>
+                  <p className="text-white font-medium text-lg" dir="ltr">{selectedApp.whatsapp_number || "غير متوفر"}</p>
+                  {selectedApp.whatsapp_number && (
+                    <a 
+                      href={`https://wa.me/${selectedApp.whatsapp_number.replace(/[^0-9]/g, '')}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-green-500 hover:bg-green-500/10 p-2 rounded-lg transition-all"
+                      title="مراسلة واتساب"
+                    >
+                      <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    </a>
+                  )}
                 </div>
               </div>
               <div>

@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
     const phone = formData.get("phone") as string;
     const has_saudi_residency = formData.get("has_saudi_residency") === "true";
     const residency_expiry = formData.get("residency_expiry") as string || null;
+    const whatsapp_number = formData.get("whatsapp_number") as string || null;
     const notes = formData.get("notes") as string || null;
     const file = formData.get("file") as File | null;
 
@@ -90,6 +91,7 @@ export async function POST(req: NextRequest) {
         country,
         nationality,
         phone,
+        whatsapp_number,
         has_saudi_residency,
         residency_expiry: residency_expiry || null,
         file_url,

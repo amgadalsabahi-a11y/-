@@ -63,15 +63,14 @@ export default function Register() {
     nationality: "",
     phone: "",
     residency_expiry: "",
+    whatsapp_number: "",
     notes: ""
   });
   const [dialCode, setDialCode] = useState("+966");
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
 
-  // ✅ ArrowLeft للرجوع في العربية، ArrowRight في الإنجليزية
   const BackArrow = locale === "ar" ? ArrowRight : ArrowLeft;
-  const ForwardArrow = locale === "ar" ? ArrowLeft : ArrowRight;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -85,7 +84,6 @@ export default function Register() {
         setErrorMsg(locale === "ar" ? "حجم الملف كبير جداً (الأقصى 10 ميجابايت)" : "File too large (Max 10MB)");
         return;
       }
-      // ✅ التحقق من نوع الملف على جانب العميل أيضاً
       const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/heic", "application/pdf"];
       if (!allowedTypes.includes(selectedFile.type) && !selectedFile.name.match(/\.(jpg|jpeg|png|webp|heic|pdf)$/i)) {
         setErrorMsg(locale === "ar" ? "يُسمح فقط بصور (JPG, PNG, WEBP) أو PDF" : "Only images (JPG, PNG, WEBP) or PDF allowed");
@@ -98,7 +96,6 @@ export default function Register() {
   };
 
   const handleSubmit = async () => {
-    // ✅ تحقق شامل من جميع الحقول المطلوبة
     if (!form.full_name.trim()) {
       setErrorMsg(locale === "ar" ? "يرجى إدخال الاسم الكامل" : "Please enter your full name");
       return;
@@ -124,7 +121,6 @@ export default function Register() {
       setErrorMsg(locale === "ar" ? "يرجى إرفاق صورة جواز السفر" : "Please upload your passport");
       return;
     }
-    // ✅ تحقق من تاريخ انتهاء الإقامة إذا كانت السعودية
     const isSaudi = form.country === "السعودية" || form.country === "Saudi Arabia";
     if (isSaudi && !form.residency_expiry) {
       setErrorMsg(locale === "ar" ? "يرجى إدخال تاريخ انتهاء الإقامة" : "Please enter residency expiry date");
@@ -141,6 +137,7 @@ export default function Register() {
       formData.append("country", form.country);
       formData.append("nationality", form.nationality);
       formData.append("phone", dialCode + " " + form.phone);
+      formData.append("whatsapp_number", form.whatsapp_number || "");
       formData.append("notes", form.notes || "");
       formData.append("file", file);
       formData.append("has_saudi_residency", isSaudi ? "true" : "false");
@@ -281,34 +278,41 @@ export default function Register() {
 
 
 
-              {/* رقم الهاتف */}
-              <div>
-                <label className="block text-gray-300 font-semibold mb-2">{t.register.phone} *</label>
-                <div className="flex flex-row gap-2">
-                  <div className="relative w-28 sm:w-32 shrink-0">
+              {/* رقم الهاتف والواتساب */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-gray-300 font-semibold mb-2">{t.register.phone} *</label>
+                  <div className="flex flex-row gap-2">
+                    <div className="relative w-24 sm:w-28 shrink-0">
+                      <input
+                        list="dial_codes_list"
+                        value={dialCode}
+                        onChange={(e) => setDialCode(e.target.value)}
+                        placeholder="+966"
+                        className="glass-input w-full px-3 py-4 text-center"
+                      />
+                    </div>
                     <input
-                      list="dial_codes_list"
-                      value={dialCode}
-                      onChange={(e) => setDialCode(e.target.value)}
-                      placeholder="+966"
-                      className="glass-input w-full px-3 py-4 text-lg text-center"
+                      type="tel"
+                      name="phone"
+                      value={form.phone}
+                      onChange={handleInputChange}
+                      dir="ltr"
+                      className="glass-input flex-1 px-4 py-4 min-w-0"
+                      placeholder="5xxxxxxx"
                     />
-                    <datalist id="dial_codes_list">
-                      {dialCodes.map(c => (
-                        <option key={c.code} value={c.code}>
-                          {c.flag} {c.name}
-                        </option>
-                      ))}
-                    </datalist>
                   </div>
+                </div>
+                <div>
+                  <label className="block text-gray-300 font-semibold mb-2">{(t.register as any).whatsapp} *</label>
                   <input
                     type="tel"
-                    name="phone"
-                    value={form.phone}
+                    name="whatsapp_number"
+                    value={form.whatsapp_number}
                     onChange={handleInputChange}
                     dir="ltr"
-                    className="glass-input flex-1 px-5 py-4 text-lg min-w-0"
-                    placeholder="5xxxxxxx"
+                    className="glass-input w-full px-5 py-4"
+                    placeholder="9665xxxxxxxx"
                   />
                 </div>
               </div>
