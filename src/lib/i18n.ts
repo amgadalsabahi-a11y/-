@@ -15,9 +15,9 @@ export const translations = {
     // Hero
     hero: {
       badge: "🇷🇺 بوابتك الأولى نحو روسيا",
-      title: "بوابة روسيا",
-      subtitle: "نفتح لك أبواب الفرص في روسيا",
-      description: "جميع استفساراتك حول السفر والإقامة في روسيا تجدها مُجابة بالتفصيل في الأسفل. نوصيك بزيارة قسم الأسئلة الشائعة قبل البدء بالتسجيل لتكون على دراية كاملة بكافة الإجراءات.",
+      title: "",
+      subtitle: "",
+      description: "",
       cta: "سجل الآن",
       learnMore: "اكتشف المزيد",
       trustedBy: "موثوق من قبل",
@@ -37,9 +37,9 @@ export const translations = {
     },
     // About
     about: {
-      title: "من نحن",
-      subtitle: "شريكك الموثوق للانطلاق نحو روسيا",
-      description: "بوابة روسيا هي منصة متخصصة تهدف لتسهيل جميع الإجراءات المتعلقة بالسفر والإقامة في روسيا. نعمل مع شبكة واسعة من الجامعات والشركات والمؤسسات الحكومية لتقديم أفضل الفرص لعملائنا.",
+      title: "",
+      subtitle: "",
+      description: "",
       features: [
         "شراكات مع أفضل 50 جامعة روسية",
         "فريق قانوني متخصص في إجراءات التأشيرات",
@@ -144,9 +144,9 @@ export const translations = {
     },
     hero: {
       badge: "🇷🇺 Your Gateway to Russia",
-      title: "Russia Gateway",
-      subtitle: "Opening Doors of Opportunity in Russia",
-      description: "All your inquiries about travel and residency in Russia are answered in detail below. We recommend visiting the FAQ section before starting your registration to be fully aware of all procedures.",
+      title: "",
+      subtitle: "",
+      description: "",
       cta: "Register Now",
       learnMore: "Learn More",
       trustedBy: "Trusted By",
@@ -164,9 +164,9 @@ export const translations = {
       ],
     },
     about: {
-      title: "About Us",
-      subtitle: "Your Trusted Partner for Launching into Russia",
-      description: "Russia Gateway is a specialized platform aimed at facilitating all procedures related to travel and residence in Russia. We work with a wide network of universities, companies, and government institutions to provide the best opportunities for our clients.",
+      title: "",
+      subtitle: "",
+      description: "",
       features: [
         "Partnerships with top 50 Russian universities",
         "Specialized legal team in visa procedures",

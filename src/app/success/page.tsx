@@ -27,8 +27,8 @@ export default function SuccessPage() {
           
           <p className="text-gray-300 text-lg md:text-xl leading-relaxed mb-10">
             {locale === "ar" 
-              ? "تم استلام طلبك بنجاح. سيتم التواصل بك في أقرب وقت خلال 30 يوم إن شاء الله."
-              : "Your application has been received successfully. We will contact you as soon as possible within 30 days, God willing."}
+              ? "تم استلام طلبك بنجاح. سيتم التواصل بك في أقرب وقت خلال 30 يوم."
+              : "Your application has been received successfully. We will contact you as soon as possible within 30 days."}
           </p>
           
           <Link href="/" className="btn-primary inline-flex">
