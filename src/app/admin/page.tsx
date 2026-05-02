@@ -45,13 +45,9 @@ export default function AdminDashboard() {
   const [aboutEn, setAboutEn] = useState({ title: "", subtitle: "", description: "", about_image: "", features: "" });
   
   const [faqs, setFaqs] = useState<any[]>([]);
-  const [services, setServices] = useState<any[]>([]);
   
   const [newFaq, setNewFaq] = useState({ question_ar: "", answer_ar: "", question_en: "", answer_en: "" });
   const [editingFaqId, setEditingFaqId] = useState<string | null>(null);
-  
-  const [newService, setNewService] = useState({ title_ar: "", desc_ar: "", title_en: "", desc_en: "" });
-  const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
 
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingAboutImage, setUploadingAboutImage] = useState(false);
@@ -60,7 +56,6 @@ export default function AdminDashboard() {
     fetchApplications();
     fetchContent("settings");
     fetchContent("faqs");
-    fetchContent("services");
   }, []);
 
   const fetchApplications = async () => {
@@ -92,8 +87,6 @@ export default function AdminDashboard() {
         setAboutEn({ title: en.about_title || "", subtitle: en.about_subtitle || "", description: en.about_description || "", about_image: en.about_image || "", features: en.features || "" });
       } else if (type === "faqs") {
         setFaqs(data || []);
-      } else if (type === "services") {
-        setServices(data || []);
       }
     } catch (e) {}
   };
@@ -179,22 +172,7 @@ export default function AdminDashboard() {
     fetchContent("faqs");
   };
 
-  const saveService = async () => {
-    const action = editingServiceId ? "edit" : "add";
-    await fetch("/api/admin/content", {
-      method: "POST",
-      body: JSON.stringify({ type: "services", payload: { action, id: editingServiceId, data: newService } })
-    });
-    setNewService({ title_ar: "", desc_ar: "", title_en: "", desc_en: "" });
-    setEditingServiceId(null);
-    fetchContent("services");
-  };
 
-  const deleteService = async (id: string) => {
-    if (!confirm("حذف؟")) return;
-    await fetch("/api/admin/content", { method: "POST", body: JSON.stringify({ type: "services", payload: { action: "delete", id } }) });
-    fetchContent("services");
-  };
 
   const stats = {
     total: applications.length,
@@ -213,7 +191,6 @@ export default function AdminDashboard() {
               <button onClick={() => setTab("apps")} className={`px-4 py-2 rounded-lg font-medium transition-all ${tab === "apps" ? "bg-brand-blue text-white shadow-lg shadow-brand-blue/20" : "text-gray-400 hover:text-white"}`}>الطلبات</button>
               <button onClick={() => setTab("hero")} className={`px-4 py-2 rounded-lg font-medium transition-all ${tab === "hero" ? "bg-brand-blue text-white shadow-lg shadow-brand-blue/20" : "text-gray-400 hover:text-white"}`}>الهيرو</button>
               <button onClick={() => setTab("about")} className={`px-4 py-2 rounded-lg font-medium transition-all ${tab === "about" ? "bg-brand-blue text-white shadow-lg shadow-brand-blue/20" : "text-gray-400 hover:text-white"}`}>من نحن</button>
-              <button onClick={() => setTab("services")} className={`px-4 py-2 rounded-lg font-medium transition-all ${tab === "services" ? "bg-brand-blue text-white shadow-lg shadow-brand-blue/20" : "text-gray-400 hover:text-white"}`}>الخدمات</button>
               <button onClick={() => setTab("faqs")} className={`px-4 py-2 rounded-lg font-medium transition-all ${tab === "faqs" ? "bg-brand-blue text-white shadow-lg shadow-brand-blue/20" : "text-gray-400 hover:text-white"}`}>الأسئلة الشائعة</button>
             </div>
           </div>
@@ -577,64 +554,6 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {tab === "services" && (
-          <div className="space-y-8 animate-fade-in">
-            <div className="glass-card-static p-8 rounded-2xl border border-white/5">
-              <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
-                <Briefcase className="text-brand-blue" />
-                {editingServiceId ? "تعديل الخدمة" : "إضافة خدمة جديدة"}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <input value={newService.title_ar} onChange={e => setNewService({...newService, title_ar: e.target.value})} placeholder="عنوان الخدمة (بالعربي)" className="glass-input w-full p-4" />
-                  <textarea value={newService.desc_ar} onChange={e => setNewService({...newService, desc_ar: e.target.value})} placeholder="وصف الخدمة (بالعربي)" className="glass-input w-full p-4 h-32" />
-                </div>
-                <div className="space-y-4" dir="ltr">
-                  <input value={newService.title_en} onChange={e => setNewService({...newService, title_en: e.target.value})} placeholder="Service Title (English)" className="glass-input w-full p-4" />
-                  <textarea value={newService.desc_en} onChange={e => setNewService({...newService, desc_en: e.target.value})} placeholder="Service Description (English)" className="glass-input w-full p-4 h-32" />
-                </div>
-              </div>
-              <div className="flex gap-4 mt-8">
-                <button onClick={saveService} className="btn-primary !py-4 !px-10 flex items-center gap-2">
-                  {editingServiceId ? <Save size={20} /> : <Plus size={20} />}
-                  {editingServiceId ? "حفظ التعديلات" : "إضافة الخدمة"}
-                </button>
-                {editingServiceId && (
-                  <button onClick={() => { setEditingServiceId(null); setNewService({ title_ar: "", desc_ar: "", title_en: "", desc_en: "" }); }} className="btn-secondary !py-4 !px-8 flex items-center gap-2">
-                    <X size={20} />
-                    إلغاء التعديل
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {services.map(ser => (
-                <div key={ser.id} className="glass-card-static p-6 rounded-2xl flex flex-col justify-between group">
-                  <div className="mb-6">
-                    <h3 className="font-bold text-white text-lg mb-2">{ser.title_ar}</h3>
-                    <p className="text-gray-400 text-sm line-clamp-3">{ser.desc_ar}</p>
-                  </div>
-                  <div className="flex justify-end gap-2 pt-4 border-t border-white/5">
-                    <button 
-                      onClick={() => {
-                        setEditingServiceId(ser.id);
-                        setNewService({ title_ar: ser.title_ar, desc_ar: ser.desc_ar, title_en: ser.title_en, desc_en: ser.desc_en });
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="p-2 text-brand-blue hover:bg-brand-blue/10 rounded-lg transition-all"
-                    >
-                      <Edit size={18} />
-                    </button>
-                    <button onClick={() => deleteService(ser.id)} className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-all">
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </main>
 
       {/* Selected Application Modal */}

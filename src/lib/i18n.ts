@@ -6,7 +6,7 @@ export const translations = {
     nav: {
       home: "الرئيسية",
       about: "من نحن",
-      services: "خدماتنا",
+
       howItWorks: "كيف نعمل",
       faq: "الأسئلة الشائعة",
       register: "سجل الآن",
@@ -136,7 +136,7 @@ export const translations = {
     nav: {
       home: "Home",
       about: "About",
-      services: "Services",
+
       howItWorks: "How It Works",
       faq: "FAQ",
       register: "Register Now",
