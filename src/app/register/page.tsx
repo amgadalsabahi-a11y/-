@@ -243,31 +243,33 @@ export default function Register() {
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-gray-300 font-semibold mb-2">{t.register.country} *</label>
-                  <select
+                  <input
+                    list="countries_list"
                     name="country"
                     value={form.country}
                     onChange={handleInputChange}
-                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50 appearance-none"
-                  >
-                    <option value="" disabled className="bg-navy-900 text-gray-400">
-                      {locale === "ar" ? "اختر بلد الإقامة" : "Select Country"}
-                    </option>
-                    {(locale === "ar" ? countriesAr : countriesEn).map(c => <option key={`c-${c}`} value={c} className="bg-navy-900">{c}</option>)}
-                  </select>
+                    placeholder={locale === "ar" ? "ابحث عن بلد الإقامة..." : "Search Country..."}
+                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50"
+                    autoComplete="off"
+                  />
+                  <datalist id="countries_list">
+                    {(locale === "ar" ? countriesAr : countriesEn).map(c => <option key={`c-${c}`} value={c} />)}
+                  </datalist>
                 </div>
                 <div>
                   <label className="block text-gray-300 font-semibold mb-2">{t.register.nationality} *</label>
-                  <select
+                  <input
+                    list="nationalities_list"
                     name="nationality"
                     value={form.nationality}
                     onChange={handleInputChange}
-                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50 appearance-none"
-                  >
-                    <option value="" disabled className="bg-navy-900 text-gray-400">
-                      {locale === "ar" ? "اختر الجنسية" : "Select Nationality"}
-                    </option>
-                    {(locale === "ar" ? countriesAr : countriesEn).map(c => <option key={`n-${c}`} value={c} className="bg-navy-900">{c}</option>)}
-                  </select>
+                    placeholder={locale === "ar" ? "ابحث عن الجنسية..." : "Search Nationality..."}
+                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50"
+                    autoComplete="off"
+                  />
+                  <datalist id="nationalities_list">
+                    {(locale === "ar" ? countriesAr : countriesEn).map(c => <option key={`n-${c}`} value={c} />)}
+                  </datalist>
                 </div>
               </div>
 
@@ -276,18 +278,23 @@ export default function Register() {
               {/* رقم الهاتف */}
               <div>
                 <label className="block text-gray-300 font-semibold mb-2">{t.register.phone} *</label>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <select 
-                    value={dialCode}
-                    onChange={(e) => setDialCode(e.target.value)}
-                    className="glass-input w-full sm:w-32 px-4 py-4 text-lg text-white bg-navy-900/80 appearance-none"
-                  >
-                    {dialCodes.map(c => (
-                      <option key={c.code} value={c.code} className="bg-navy-900">
-                        {c.flag} {c.code}
-                      </option>
-                    ))}
-                  </select>
+                <div className="flex flex-row gap-2">
+                  <div className="relative w-28 sm:w-32 shrink-0">
+                    <input
+                      list="dial_codes_list"
+                      value={dialCode}
+                      onChange={(e) => setDialCode(e.target.value)}
+                      placeholder="+966"
+                      className="glass-input w-full px-3 py-4 text-lg text-center"
+                    />
+                    <datalist id="dial_codes_list">
+                      {dialCodes.map(c => (
+                        <option key={c.code} value={c.code}>
+                          {c.flag} {c.name}
+                        </option>
+                      ))}
+                    </datalist>
+                  </div>
                   <input
                     type="tel"
                     name="phone"
@@ -302,24 +309,10 @@ export default function Register() {
 
               {/* تاريخ انتهاء الإقامة (يظهر فقط للسعودية) */}
               {(form.country === "السعودية" || form.country === "Saudi Arabia") && (
-                <div className="animate-fade-in">
+                <div className="animate-fade-in bg-white/5 p-6 rounded-2xl border border-white/10">
                   <label className="block text-gray-300 font-semibold mb-2">
                     {locale === "ar" ? "تاريخ انتهاء الإقامة *" : "Residency Expiry Date *"}
                   </label>
-                  <input
-                    type="date"
-                    name="residency_expiry"
-                    value={form.residency_expiry}
-                    onChange={handleInputChange}
-                    className="glass-input w-full px-5 py-4 text-lg"
-                  />
-                </div>
-              )}
-
-              {/* تاريخ الإقامة (السعودية فقط) */}
-              {(form.country === "السعودية" || form.country === "Saudi Arabia") && (
-                <div className="animate-fade-in bg-white/5 p-4 rounded-xl border border-white/10">
-                  <label className="block text-gray-300 font-semibold mb-2">{t.register.residencyExpiry} *</label>
                   <input
                     type="date"
                     name="residency_expiry"
