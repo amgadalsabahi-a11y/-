@@ -86,7 +86,7 @@ export default function AdminLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="glass-input w-full px-5 py-3 ps-12 text-white"
-                placeholder="admin@russia-gateway.com"
+                placeholder={t.admin.email}
                 dir="ltr"
               />
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
