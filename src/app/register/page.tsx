@@ -71,6 +71,7 @@ export default function Register() {
   const [fileName, setFileName] = useState("");
 
   const BackArrow = locale === "ar" ? ArrowRight : ArrowLeft;
+  const ForwardArrow = locale === "ar" ? ArrowLeft : ArrowRight;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
