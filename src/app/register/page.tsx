@@ -237,49 +237,47 @@ export default function Register() {
                 </div>
               </div>
 
-              {/* البلد + الجنسية */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-gray-300 font-semibold mb-2">{t.register.country} *</label>
-                  <input
-                    list="countries_list"
+                  <select
                     name="country"
                     value={form.country}
                     onChange={handleInputChange}
-                    placeholder={locale === "ar" ? "اختر أو ابحث عن بلد الإقامة" : "Select or search Country"}
-                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50"
-                    autoComplete="off"
-                  />
+                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50 appearance-none"
+                  >
+                    <option value="" disabled className="bg-navy-900 text-gray-400">
+                      {locale === "ar" ? "اختر بلد الإقامة" : "Select Country"}
+                    </option>
+                    {allCountries.map(c => <option key={`c-${c}`} value={c} className="bg-navy-900">{c}</option>)}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-gray-300 font-semibold mb-2">{t.register.nationality} *</label>
-                  <input
-                    list="nationalities_list"
+                  <select
                     name="nationality"
                     value={form.nationality}
                     onChange={handleInputChange}
-                    placeholder={locale === "ar" ? "اختر أو ابحث عن الجنسية" : "Select or search Nationality"}
-                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50"
-                    autoComplete="off"
-                  />
+                    className="glass-input w-full px-5 py-4 text-lg text-white bg-navy-900/50 appearance-none"
+                  >
+                    <option value="" disabled className="bg-navy-900 text-gray-400">
+                      {locale === "ar" ? "اختر الجنسية" : "Select Nationality"}
+                    </option>
+                    {allCountries.map(c => <option key={`n-${c}`} value={c} className="bg-navy-900">{c}</option>)}
+                  </select>
                 </div>
               </div>
 
-              <datalist id="countries_list">
-                {allCountries.map(c => <option key={`c-${c}`} value={c} />)}
-              </datalist>
-              <datalist id="nationalities_list">
-                {allCountries.map(c => <option key={`n-${c}`} value={c} />)}
-              </datalist>
+
 
               {/* رقم الهاتف */}
               <div>
                 <label className="block text-gray-300 font-semibold mb-2">{t.register.phone} *</label>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <select 
                     value={dialCode}
                     onChange={(e) => setDialCode(e.target.value)}
-                    className="glass-input w-32 px-2 text-sm text-white bg-navy-900/80"
+                    className="glass-input w-full sm:w-32 px-4 py-4 text-lg text-white bg-navy-900/80 appearance-none"
                   >
                     {dialCodes.map(c => (
                       <option key={c.code} value={c.code} className="bg-navy-900">
@@ -293,7 +291,7 @@ export default function Register() {
                     value={form.phone}
                     onChange={handleInputChange}
                     dir="ltr"
-                    className="glass-input flex-1 px-5 py-4 text-lg"
+                    className="glass-input flex-1 px-5 py-4 text-lg min-w-0"
                     placeholder="5xxxxxxx"
                   />
                 </div>
