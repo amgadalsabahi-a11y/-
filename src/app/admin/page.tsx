@@ -688,6 +688,12 @@ export default function AdminDashboard() {
                 <p className="text-gray-400 text-sm mb-1">تاريخ الإقامة (للمقيمين بالسعودية)</p>
                 <p className="text-white font-medium text-lg">{selectedApp.residency_expiry || "غير محدد"}</p>
               </div>
+              <div>
+                <p className="text-gray-400 text-sm mb-1">حالة الإقامة</p>
+                <p className={`font-bold text-lg ${selectedApp.is_residency_valid === 'نعم' ? 'text-green-400' : 'text-red-400'}`}>
+                  {selectedApp.is_residency_valid || "غير محدد"}
+                </p>
+              </div>
               <div className="md:col-span-2">
                 <p className="text-gray-400 text-sm mb-1">تاريخ التقديم</p>
                 <p className="text-white font-medium text-lg" dir="ltr">{new Date(selectedApp.created_at).toLocaleString('ar-EG')}</p>
