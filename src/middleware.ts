@@ -43,10 +43,10 @@ export async function middleware(request: NextRequest) {
     path.startsWith("/api/admin") &&
     !path.startsWith("/api/admin/login")
   ) {
-    // اسمح بـ GET على /api/admin/content للواجهة العامة
+    // اسمح بـ GET على /api/admin/content و /api/admin/file-url للواجهة العامة
     if (
       request.method === "GET" &&
-      path.startsWith("/api/admin/content")
+      (path.startsWith("/api/admin/content") || path.startsWith("/api/admin/file-url"))
     ) {
       return NextResponse.next();
     }
