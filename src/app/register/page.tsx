@@ -63,6 +63,7 @@ export default function Register() {
     nationality: "",
     phone: "",
     residency_expiry: "",
+    is_residency_valid: "",
     whatsapp_number: "",
     notes: ""
   });
@@ -145,6 +146,7 @@ export default function Register() {
       formData.append("has_saudi_residency", isSaudi ? "true" : "false");
       if (isSaudi) {
         formData.append("residency_expiry", form.residency_expiry);
+        formData.append("is_residency_valid", form.is_residency_valid);
       }
 
       const controller = new AbortController();
@@ -199,6 +201,17 @@ export default function Register() {
               <p className="text-gray-400 text-lg">{t.register.subtitle}</p>
               <div className="mt-4 inline-block px-4 py-2 bg-brand-blue/10 border border-brand-blue/20 rounded-full text-brand-blue font-bold text-sm">
                 {locale === "ar" ? "سيتم الرد خلال من 25 إلى 40 يوم" : "Response time: 25 to 40 days"}
+              </div>
+            </div>
+
+            {/* Duplicate Warning */}
+            <div className="mb-8 p-6 rounded-2xl bg-brand-red/10 border border-brand-red/30 flex items-start gap-4 animate-fade-in shadow-lg">
+              <AlertCircle size={28} className="text-brand-red shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-brand-red font-bold text-lg mb-1">{locale === "ar" ? "تنبيه هام جداً" : "Very Important Warning"}</h3>
+                <p className="text-gray-200 text-sm md:text-base leading-relaxed">
+                  {(t.register as any).duplicateWarning}
+                </p>
               </div>
             </div>
 
@@ -350,6 +363,26 @@ export default function Register() {
                     onChange={handleInputChange}
                     className="glass-input w-full px-5 py-4 text-lg"
                   />
+                  
+                  <div className="mt-6">
+                    <label className="block text-gray-300 font-semibold mb-3">{(t.register as any).residencyValid} *</label>
+                    <div className="flex gap-4">
+                      {["نعم", "لا"].map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => setForm(prev => ({ ...prev, is_residency_valid: option }))}
+                          className={`flex-1 py-3 px-6 rounded-xl border transition-all font-bold ${
+                            form.is_residency_valid === option 
+                              ? "bg-brand-blue border-brand-blue text-white shadow-lg shadow-brand-blue/20" 
+                              : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+                          }`}
+                        >
+                          {locale === "ar" ? option : (option === "نعم" ? "Yes" : "No")}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -368,6 +401,10 @@ export default function Register() {
                   </span>
                   <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} />
                 </label>
+                <p className="mt-3 text-brand-red text-sm font-medium flex items-center gap-2">
+                  <AlertCircle size={16} />
+                  {(t.register as any).passportWarning}
+                </p>
               </div>
 
               {/* ملاحظات */}

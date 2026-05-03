@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
     const has_saudi_residency = formData.get("has_saudi_residency") === "true";
     const residency_expiry = formData.get("residency_expiry") as string || null;
     const whatsapp_number = formData.get("whatsapp_number") as string || null;
+    const is_residency_valid = formData.get("is_residency_valid") as string || null;
     const notes = formData.get("notes") as string || null;
     const file = formData.get("file") as File | null;
 
@@ -21,6 +22,20 @@ export async function POST(req: NextRequest) {
     if (!full_name || !phone) {
       return NextResponse.json(
         { error: "الاسم ورقم الهاتف مطلوبان" },
+        { status: 400 }
+      );
+    }
+
+    // ✅ منع التكرار: التحقق من وجود رقم الهاتف أو الواتساب مسبقاً
+    const { data: existingApp } = await supabaseAdmin
+      .from("users_applications")
+      .select("id")
+      .or(`phone.eq."${phone}",whatsapp_number.eq."${whatsapp_number}"`)
+      .maybeSingle();
+
+    if (existingApp) {
+      return NextResponse.json(
+        { error: "لديك طلب سابق مسجل لدينا بالفعل. يرجى انتظار الرد وعدم تكرار التقديم لتجنب رفض طلبك نهائياً." },
         { status: 400 }
       );
     }
@@ -94,6 +109,7 @@ export async function POST(req: NextRequest) {
         whatsapp_number,
         has_saudi_residency,
         residency_expiry: residency_expiry || null,
+        is_residency_valid,
         file_url,
         notes,
         status: "جديد",

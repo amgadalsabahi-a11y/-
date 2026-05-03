@@ -100,6 +100,9 @@ export const translations = {
       submitting: "جاري الإرسال...",
       success: "تم إرسال طلبك بنجاح! سنتواصل معك قريباً.",
       error: "حدث خطأ. يرجى المحاولة مرة أخرى.",
+      duplicateWarning: "تحذير: يرجى عدم تقديم أكثر من طلب واحد. تقديم طلبات متكررة سيؤدي إلى رفض طلبك تماماً ولن يتم التواصل معك.",
+      passportWarning: "ملاحظة: في حال كانت صورة الجواز غير واضحة أو غير مكتملة، سيتم رفض الطلب تلقائياً.",
+      residencyValid: "هل إقامتك سارية؟",
       required: "هذا الحقل مطلوب",
     },
     // Admin
@@ -225,6 +228,9 @@ export const translations = {
       submitting: "Submitting...",
       success: "Your application has been submitted successfully! We will contact you soon.",
       error: "An error occurred. Please try again.",
+      duplicateWarning: "Warning: Please do not submit more than one application. Repeated submissions will lead to immediate rejection and no communication.",
+      passportWarning: "Note: If the passport image is unclear or incomplete, the application will be rejected automatically.",
+      residencyValid: "Is your residency valid?",
       required: "This field is required",
     },
     admin: {
