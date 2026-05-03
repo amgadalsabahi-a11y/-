@@ -5,12 +5,16 @@ import { useLocale } from "./LocaleProvider";
 import { getTranslations } from "@/lib/i18n";
 import Link from "next/link";
 import { ArrowRight, ArrowLeft } from "lucide-react";
+import { useSafeUrl } from "@/lib/useSafeUrl";
 
 export default function Hero() {
   const { locale } = useLocale();
   const t = getTranslations(locale);
   const [bgImage, setBgImage] = useState<string | null>(null);
   const [content, setContent] = useState<any>(null);
+
+  // استخدام الـ hook للصورة الخلفية
+  const { safeUrl } = useSafeUrl(bgImage);
 
   useEffect(() => {
     fetch("/api/admin/content?type=settings", { next: { revalidate: 300 } } as any)
@@ -50,7 +54,7 @@ export default function Hero() {
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-navy-950/80 z-10" />
         <img
-          src={bgImage || "https://images.unsplash.com/photo-1513326738677-b964603b136d?q=80&w=2000"}
+          src={safeUrl || "https://images.unsplash.com/photo-1513326738677-b964603b136d?q=80&w=2000"}
           alt="Russia"
           className="w-full h-full object-cover"
         />

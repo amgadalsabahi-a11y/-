@@ -4,12 +4,18 @@ import { useEffect, useState } from "react";
 import { useLocale } from "./LocaleProvider";
 import { getTranslations } from "@/lib/i18n";
 import { CheckCircle2 } from "lucide-react";
+import { useSafeUrl } from "@/lib/useSafeUrl";
 
 export default function About() {
   const { locale } = useLocale();
   const t = getTranslations(locale);
   const [content, setContent] = useState<any>(null);
-  const [loading, setLoading] = useState(true); // ✅ إضافة skeleton loader
+  const [loading, setLoading] = useState(true);
+
+  // استخدام الـ hook للصور الثلاث
+  const { safeUrl: safeAboutImage } = useSafeUrl(content?.about_image);
+  const { safeUrl: safeExtra1 } = useSafeUrl(content?.extra_image_1);
+  const { safeUrl: safeExtra2 } = useSafeUrl(content?.extra_image_2);
 
   useEffect(() => {
     fetch("/api/admin/content?type=settings", { next: { revalidate: 300 } } as any)
@@ -50,7 +56,6 @@ export default function About() {
   const featuresList = content?.features
     ? content.features.split("\n").filter((f: string) => f.trim() !== "")
     : t.about.features;
-  const aboutImage = content?.about_image;
 
   // ✅ Skeleton loader أثناء التحميل
   if (loading) {
@@ -105,10 +110,10 @@ export default function About() {
             <div className="glass-card-static p-8 md:p-10 relative overflow-hidden group min-h-[300px] md:min-h-[400px] flex items-center justify-center">
               <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/10 to-brand-red/10 group-hover:scale-105 transition-transform duration-500" />
 
-              {aboutImage ? (
+              {safeAboutImage ? (
                 <div className="absolute inset-0 z-10 w-full h-full p-4">
                   <div className="w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                    <img src={aboutImage} alt="About Us" className="w-full h-full object-cover" />
+                    <img src={safeAboutImage} alt="About Us" className="w-full h-full object-cover" />
                   </div>
                 </div>
               ) : (
@@ -136,21 +141,21 @@ export default function About() {
         </div>
 
         {/* ✅ الصور الإضافية - مكتملة مش جوا كرت */}
-        {(content?.extra_image_1 || content?.extra_image_2) && (
+        {(safeExtra1 || safeExtra2) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 mt-12 md:mt-20">
-            {content.extra_image_1 && (
+            {safeExtra1 && (
               <div className="w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/5 group">
                 <img 
-                  src={content.extra_image_1} 
+                  src={safeExtra1} 
                   alt="Extra About 1" 
                   className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" 
                 />
               </div>
             )}
-            {content.extra_image_2 && (
+            {safeExtra2 && (
               <div className="w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/5 group">
                 <img 
-                  src={content.extra_image_2} 
+                  src={safeExtra2} 
                   alt="Extra About 2" 
                   className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" 
                 />

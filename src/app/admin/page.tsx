@@ -4,17 +4,17 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/components/LocaleProvider";
 import { getTranslations } from "@/lib/i18n";
-import { 
-  Users, 
-  Settings, 
-  LogOut, 
-  Layout, 
-  CheckCircle, 
-  Clock, 
-  XCircle, 
-  Trash2, 
-  Plus, 
-  Save, 
+import {
+  Users,
+  Settings,
+  LogOut,
+  Layout,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Trash2,
+  Plus,
+  Save,
   HelpCircle,
   Briefcase,
   ChevronRight,
@@ -33,19 +33,19 @@ export default function AdminDashboard() {
   const [appFilter, setAppFilter] = useState("الكل");
   const [selectedApp, setSelectedApp] = useState<any | null>(null);
   // Settings State
-  const [heroAr, setHeroAr] = useState({ 
+  const [heroAr, setHeroAr] = useState({
     title: "", subtitle: "", description: "", cta: "", image: "",
-    title_color: "#ffffff", subtitle_color: "#1e50a2", description_color: "#d1d5db" 
+    title_color: "#ffffff", subtitle_color: "#1e50a2", description_color: "#d1d5db"
   });
-  const [heroEn, setHeroEn] = useState({ 
+  const [heroEn, setHeroEn] = useState({
     title: "", subtitle: "", description: "", cta: "", image: "",
-    title_color: "#ffffff", subtitle_color: "#1e50a2", description_color: "#d1d5db" 
+    title_color: "#ffffff", subtitle_color: "#1e50a2", description_color: "#d1d5db"
   });
   const [aboutAr, setAboutAr] = useState({ title: "", subtitle: "", description: "", about_image: "", features: "", extra_image_1: "", extra_image_2: "" });
   const [aboutEn, setAboutEn] = useState({ title: "", subtitle: "", description: "", about_image: "", features: "", extra_image_1: "", extra_image_2: "" });
-  
+
   const [faqs, setFaqs] = useState<any[]>([]);
-  
+
   const [newFaq, setNewFaq] = useState({ question_ar: "", answer_ar: "", question_en: "", answer_en: "" });
   const [editingFaqId, setEditingFaqId] = useState<string | null>(null);
 
@@ -64,7 +64,7 @@ export default function AdminDashboard() {
       const res = await fetch("/api/admin/applications");
       const { data } = await res.json();
       setApplications(data || []);
-    } catch (e) {}
+    } catch (e) { }
     setLoadingApps(false);
   };
 
@@ -75,26 +75,26 @@ export default function AdminDashboard() {
       if (type === "settings" && data) {
         const ar = JSON.parse(data.about_ar || "{}");
         const en = JSON.parse(data.about_en || "{}");
-        setHeroAr({ 
+        setHeroAr({
           title: ar.hero_title || "", subtitle: ar.hero_subtitle || "", description: ar.hero_description || "", cta: ar.hero_cta || "", image: ar.hero_image || "",
           title_color: ar.hero_title_color || "#ffffff", subtitle_color: ar.hero_subtitle_color || "#1e50a2", description_color: ar.hero_description_color || "#d1d5db"
         });
-        setHeroEn({ 
+        setHeroEn({
           title: en.hero_title || "", subtitle: en.hero_subtitle || "", description: en.hero_description || "", cta: en.hero_cta || "", image: en.hero_image || "",
           title_color: en.hero_title_color || "#ffffff", subtitle_color: en.hero_subtitle_color || "#1e50a2", description_color: en.hero_description_color || "#d1d5db"
         });
-        setAboutAr({ 
+        setAboutAr({
           title: ar.about_title || "", subtitle: ar.about_subtitle || "", description: ar.about_description || "", about_image: ar.about_image || "", features: ar.features || "",
           extra_image_1: ar.extra_image_1 || "", extra_image_2: ar.extra_image_2 || ""
         });
-        setAboutEn({ 
+        setAboutEn({
           title: en.about_title || "", subtitle: en.about_subtitle || "", description: en.about_description || "", about_image: en.about_image || "", features: en.features || "",
           extra_image_1: en.extra_image_1 || "", extra_image_2: en.extra_image_2 || ""
         });
       } else if (type === "faqs") {
         setFaqs(data || []);
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const updateStatus = async (id: string, newStatus: string) => {
@@ -105,7 +105,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({ id, status: newStatus }),
       });
       if (res.ok) fetchApplications();
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const deleteApplication = async (id: string) => {
@@ -113,7 +113,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`/api/admin/applications?id=${id}`, { method: "DELETE" });
       if (res.ok) fetchApplications();
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const saveSettings = async () => {
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
     if (!file) return;
 
     if (target === 'hero') setUploadingImage(true); else setUploadingAboutImage(true);
-    
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -160,9 +160,9 @@ export default function AdminDashboard() {
         alert("فشل الرفع: " + (data.error || ""));
       }
     } catch (err) { alert("خطأ في الرفع"); }
-    finally { 
-      if (target === 'hero') setUploadingImage(false); 
-      else setUploadingAboutImage(false); 
+    finally {
+      if (target === 'hero') setUploadingImage(false);
+      else setUploadingAboutImage(false);
     }
   };
 
@@ -206,7 +206,22 @@ export default function AdminDashboard() {
     fetchContent("faqs");
   };
 
-
+  // ✅ فتح ملف المستخدم عبر Signed URL (آمن - البكيت private)
+  const openFile = async (fileUrl: string) => {
+    try {
+      const res = await fetch(
+        `/api/admin/file-url?url=${encodeURIComponent(fileUrl)}`
+      );
+      const data = await res.json();
+      if (data.signedUrl) {
+        window.open(data.signedUrl, "_blank");
+      } else {
+        alert("فشل فتح الملف، يرجى المحاولة مرة أخرى");
+      }
+    } catch {
+      alert("خطأ في فتح الملف");
+    }
+  };
 
   const stats = {
     total: applications.length,
@@ -293,8 +308,8 @@ export default function AdminDashboard() {
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {(appFilter === "الكل" ? applications : applications.filter(a => a.status === appFilter)).map(app => (
-                      <tr 
-                        key={app.id} 
+                      <tr
+                        key={app.id}
                         className="hover:bg-white/5 transition-colors text-sm cursor-pointer"
                         onClick={() => setSelectedApp(app)}
                       >
@@ -305,9 +320,9 @@ export default function AdminDashboard() {
                           {app.whatsapp_number ? (
                             <div className="flex items-center gap-2">
                               <span dir="ltr" className="text-xs">{app.whatsapp_number}</span>
-                              <a 
-                                href={`https://wa.me/${app.whatsapp_number.replace(/[^0-9]/g, '')}`} 
-                                target="_blank" 
+                              <a
+                                href={`https://wa.me/${app.whatsapp_number.replace(/[^0-9]/g, '')}`}
+                                target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-green-500 hover:bg-green-500/10 p-1.5 rounded-md transition-all shrink-0"
                                 title="مراسلة واتساب"
@@ -327,20 +342,19 @@ export default function AdminDashboard() {
                         <td className="px-4 py-4 text-gray-300 max-w-[150px] truncate" title={app.notes}>{app.notes || "-"}</td>
                         <td className="px-4 py-4 text-gray-400">{app.residency_expiry || "-"}</td>
                         <td className="px-4 py-4">
+                          {/* ✅ Signed URL آمن بدلاً من رابط عام */}
                           {app.file_url ? (
-                            <a 
-                              href={app.file_url} 
-                              target="_blank" 
+                            <button
+                              onClick={(e) => { e.stopPropagation(); openFile(app.file_url); }}
                               className="text-brand-blue hover:underline font-bold flex items-center gap-1"
-                              onClick={(e) => e.stopPropagation()}
                             >
                               <Layout size={14} /> عرض
-                            </a>
+                            </button>
                           ) : "-"}
                         </td>
                         <td className="px-6 py-4">
-                          <select 
-                            value={app.status} 
+                          <select
+                            value={app.status}
                             onChange={(e) => updateStatus(app.id, e.target.value)}
                             onClick={(e) => e.stopPropagation()}
                             className="bg-navy-900 border border-white/10 text-xs rounded-lg px-3 py-1.5 focus:border-brand-blue transition-all"
@@ -351,8 +365,8 @@ export default function AdminDashboard() {
                           </select>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); deleteApplication(app.id); }} 
+                          <button
+                            onClick={(e) => { e.stopPropagation(); deleteApplication(app.id); }}
                             className="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-all"
                           >
                             <Trash2 size={18} />
@@ -390,55 +404,55 @@ export default function AdminDashboard() {
                       <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                           <label className="block text-gray-400 text-sm mb-2">العنوان الرئيسي</label>
-                          <input value={heroAr.title} onChange={e => setHeroAr({...heroAr, title: e.target.value})} className="glass-input w-full p-4" />
+                          <input value={heroAr.title} onChange={e => setHeroAr({ ...heroAr, title: e.target.value })} className="glass-input w-full p-4" />
                         </div>
                         <div className="w-full sm:w-24">
                           <label className="block text-gray-400 text-sm mb-2">اللون</label>
-                          <input type="color" value={heroAr.title_color} onChange={e => setHeroAr({...heroAr, title_color: e.target.value})} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
+                          <input type="color" value={heroAr.title_color} onChange={e => setHeroAr({ ...heroAr, title_color: e.target.value })} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                           <label className="block text-gray-400 text-sm mb-2">العنوان الفرعي</label>
-                          <input value={heroAr.subtitle} onChange={e => setHeroAr({...heroAr, subtitle: e.target.value})} className="glass-input w-full p-4" />
+                          <input value={heroAr.subtitle} onChange={e => setHeroAr({ ...heroAr, subtitle: e.target.value })} className="glass-input w-full p-4" />
                         </div>
                         <div className="w-full sm:w-24">
                           <label className="block text-gray-400 text-sm mb-2">اللون</label>
-                          <input type="color" value={heroAr.subtitle_color} onChange={e => setHeroAr({...heroAr, subtitle_color: e.target.value})} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
+                          <input type="color" value={heroAr.subtitle_color} onChange={e => setHeroAr({ ...heroAr, subtitle_color: e.target.value })} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                           <label className="block text-gray-400 text-sm mb-2">الوصف</label>
-                          <textarea value={heroAr.description} onChange={e => setHeroAr({...heroAr, description: e.target.value})} className="glass-input w-full p-4 h-32" />
+                          <textarea value={heroAr.description} onChange={e => setHeroAr({ ...heroAr, description: e.target.value })} className="glass-input w-full p-4 h-32" />
                         </div>
                         <div className="w-full sm:w-24">
                           <label className="block text-gray-400 text-sm mb-2">اللون</label>
-                          <input type="color" value={heroAr.description_color} onChange={e => setHeroAr({...heroAr, description_color: e.target.value})} className="glass-input w-full h-full p-1 cursor-pointer min-h-[58px]" />
+                          <input type="color" value={heroAr.description_color} onChange={e => setHeroAr({ ...heroAr, description_color: e.target.value })} className="glass-input w-full h-full p-1 cursor-pointer min-h-[58px]" />
                         </div>
                       </div>
                       <div>
                         <label className="block text-gray-400 text-sm mb-2">نص الزر (CTA)</label>
-                        <input value={heroAr.cta} onChange={e => setHeroAr({...heroAr, cta: e.target.value})} className="glass-input w-full p-4" />
+                        <input value={heroAr.cta} onChange={e => setHeroAr({ ...heroAr, cta: e.target.value })} className="glass-input w-full p-4" />
                       </div>
                     </>
                   ) : (
                     <>
                       <div>
                         <label className="block text-gray-400 text-sm mb-2">العنوان</label>
-                        <input value={aboutAr.title} onChange={e => setAboutAr({...aboutAr, title: e.target.value})} className="glass-input w-full p-4" />
+                        <input value={aboutAr.title} onChange={e => setAboutAr({ ...aboutAr, title: e.target.value })} className="glass-input w-full p-4" />
                       </div>
                       <div>
                         <label className="block text-gray-400 text-sm mb-2">العنوان الفرعي</label>
-                        <input value={aboutAr.subtitle} onChange={e => setAboutAr({...aboutAr, subtitle: e.target.value})} className="glass-input w-full p-4" />
+                        <input value={aboutAr.subtitle} onChange={e => setAboutAr({ ...aboutAr, subtitle: e.target.value })} className="glass-input w-full p-4" />
                       </div>
                       <div>
                         <label className="block text-gray-400 text-sm mb-2">الوصف</label>
-                        <textarea value={aboutAr.description} onChange={e => setAboutAr({...aboutAr, description: e.target.value})} className="glass-input w-full p-4 h-32" />
+                        <textarea value={aboutAr.description} onChange={e => setAboutAr({ ...aboutAr, description: e.target.value })} className="glass-input w-full p-4 h-32" />
                       </div>
                       <div>
                         <label className="block text-gray-400 text-sm mb-2">المميزات (كل ميزة في سطر)</label>
-                        <textarea value={aboutAr.features} onChange={e => setAboutAr({...aboutAr, features: e.target.value})} className="glass-input w-full p-4 h-32" />
+                        <textarea value={aboutAr.features} onChange={e => setAboutAr({ ...aboutAr, features: e.target.value })} className="glass-input w-full p-4 h-32" />
                       </div>
                     </>
                   )}
@@ -452,55 +466,55 @@ export default function AdminDashboard() {
                       <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                           <label className="block text-gray-500 text-sm mb-2">Main Title</label>
-                          <input value={heroEn.title} onChange={e => setHeroEn({...heroEn, title: e.target.value})} className="glass-input w-full p-4" />
+                          <input value={heroEn.title} onChange={e => setHeroEn({ ...heroEn, title: e.target.value })} className="glass-input w-full p-4" />
                         </div>
                         <div className="w-full sm:w-24">
                           <label className="block text-gray-500 text-sm mb-2">Color</label>
-                          <input type="color" value={heroEn.title_color} onChange={e => setHeroEn({...heroEn, title_color: e.target.value})} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
+                          <input type="color" value={heroEn.title_color} onChange={e => setHeroEn({ ...heroEn, title_color: e.target.value })} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                           <label className="block text-gray-500 text-sm mb-2">Subtitle</label>
-                          <input value={heroEn.subtitle} onChange={e => setHeroEn({...heroEn, subtitle: e.target.value})} className="glass-input w-full p-4" />
+                          <input value={heroEn.subtitle} onChange={e => setHeroEn({ ...heroEn, subtitle: e.target.value })} className="glass-input w-full p-4" />
                         </div>
                         <div className="w-full sm:w-24">
                           <label className="block text-gray-500 text-sm mb-2">Color</label>
-                          <input type="color" value={heroEn.subtitle_color} onChange={e => setHeroEn({...heroEn, subtitle_color: e.target.value})} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
+                          <input type="color" value={heroEn.subtitle_color} onChange={e => setHeroEn({ ...heroEn, subtitle_color: e.target.value })} className="glass-input w-full h-[58px] p-1 cursor-pointer" />
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                           <label className="block text-gray-500 text-sm mb-2">Description</label>
-                          <textarea value={heroEn.description} onChange={e => setHeroEn({...heroEn, description: e.target.value})} className="glass-input w-full p-4 h-32" />
+                          <textarea value={heroEn.description} onChange={e => setHeroEn({ ...heroEn, description: e.target.value })} className="glass-input w-full p-4 h-32" />
                         </div>
                         <div className="w-full sm:w-24">
                           <label className="block text-gray-500 text-sm mb-2">Color</label>
-                          <input type="color" value={heroEn.description_color} onChange={e => setHeroEn({...heroEn, description_color: e.target.value})} className="glass-input w-full h-full p-1 cursor-pointer min-h-[58px]" />
+                          <input type="color" value={heroEn.description_color} onChange={e => setHeroEn({ ...heroEn, description_color: e.target.value })} className="glass-input w-full h-full p-1 cursor-pointer min-h-[58px]" />
                         </div>
                       </div>
                       <div>
                         <label className="block text-gray-500 text-sm mb-2">Button Text (CTA)</label>
-                        <input value={heroEn.cta} onChange={e => setHeroEn({...heroEn, cta: e.target.value})} className="glass-input w-full p-4" />
+                        <input value={heroEn.cta} onChange={e => setHeroEn({ ...heroEn, cta: e.target.value })} className="glass-input w-full p-4" />
                       </div>
                     </>
                   ) : (
                     <>
                       <div>
                         <label className="block text-gray-500 text-sm mb-2">Title</label>
-                        <input value={aboutEn.title} onChange={e => setAboutEn({...aboutEn, title: e.target.value})} className="glass-input w-full p-4" />
+                        <input value={aboutEn.title} onChange={e => setAboutEn({ ...aboutEn, title: e.target.value })} className="glass-input w-full p-4" />
                       </div>
                       <div>
                         <label className="block text-gray-500 text-sm mb-2">Subtitle</label>
-                        <input value={aboutEn.subtitle} onChange={e => setAboutEn({...aboutEn, subtitle: e.target.value})} className="glass-input w-full p-4" />
+                        <input value={aboutEn.subtitle} onChange={e => setAboutEn({ ...aboutEn, subtitle: e.target.value })} className="glass-input w-full p-4" />
                       </div>
                       <div>
                         <label className="block text-gray-500 text-sm mb-2">Description</label>
-                        <textarea value={aboutEn.description} onChange={e => setAboutEn({...aboutEn, description: e.target.value})} className="glass-input w-full p-4 h-32" />
+                        <textarea value={aboutEn.description} onChange={e => setAboutEn({ ...aboutEn, description: e.target.value })} className="glass-input w-full p-4 h-32" />
                       </div>
                       <div>
                         <label className="block text-gray-500 text-sm mb-2">Features (one per line)</label>
-                        <textarea value={aboutEn.features} onChange={e => setAboutEn({...aboutEn, features: e.target.value})} className="glass-input w-full p-4 h-32" />
+                        <textarea value={aboutEn.features} onChange={e => setAboutEn({ ...aboutEn, features: e.target.value })} className="glass-input w-full p-4 h-32" />
                       </div>
                     </>
                   )}
@@ -530,7 +544,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* ✅ الصور الإضافية لأسفل قسم من نحن */}
+              {/* الصور الإضافية لأسفل قسم من نحن */}
               {tab === 'about' && (
                 <div className="mt-12 pt-8 border-t border-white/10">
                   <h3 className="text-lg font-bold text-brand-blue mb-6">صور إضافية لأسفل القسم (مكتملة)</h3>
@@ -579,12 +593,12 @@ export default function AdminDashboard() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
-                  <input value={newFaq.question_ar} onChange={e => setNewFaq({...newFaq, question_ar: e.target.value})} placeholder="السؤال (بالعربي)" className="glass-input w-full p-4" />
-                  <textarea value={newFaq.answer_ar} onChange={e => setNewFaq({...newFaq, answer_ar: e.target.value})} placeholder="الجواب (بالعربي)" className="glass-input w-full p-4 h-32" />
+                  <input value={newFaq.question_ar} onChange={e => setNewFaq({ ...newFaq, question_ar: e.target.value })} placeholder="السؤال (بالعربي)" className="glass-input w-full p-4" />
+                  <textarea value={newFaq.answer_ar} onChange={e => setNewFaq({ ...newFaq, answer_ar: e.target.value })} placeholder="الجواب (بالعربي)" className="glass-input w-full p-4 h-32" />
                 </div>
                 <div className="space-y-4" dir="ltr">
-                  <input value={newFaq.question_en} onChange={e => setNewFaq({...newFaq, question_en: e.target.value})} placeholder="Question (English)" className="glass-input w-full p-4" />
-                  <textarea value={newFaq.answer_en} onChange={e => setNewFaq({...newFaq, answer_en: e.target.value})} placeholder="Answer (English)" className="glass-input w-full p-4 h-32" />
+                  <input value={newFaq.question_en} onChange={e => setNewFaq({ ...newFaq, question_en: e.target.value })} placeholder="Question (English)" className="glass-input w-full p-4" />
+                  <textarea value={newFaq.answer_en} onChange={e => setNewFaq({ ...newFaq, answer_en: e.target.value })} placeholder="Answer (English)" className="glass-input w-full p-4 h-32" />
                 </div>
               </div>
               <div className="flex gap-4 mt-8">
@@ -609,7 +623,7 @@ export default function AdminDashboard() {
                     <p className="text-gray-400 text-sm line-clamp-2">{faq.answer_ar}</p>
                   </div>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => {
                         setEditingFaqId(faq.id);
                         setNewFaq({ question_ar: faq.question_ar, answer_ar: faq.answer_ar, question_en: faq.question_en, answer_en: faq.answer_en });
@@ -635,17 +649,17 @@ export default function AdminDashboard() {
       {selectedApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={() => setSelectedApp(null)}>
           <div className="bg-navy-900 border border-white/10 p-6 md:p-8 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative" onClick={e => e.stopPropagation()}>
-            <button 
+            <button
               onClick={() => setSelectedApp(null)}
               className="absolute top-4 left-4 p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
             >
               <X size={24} />
             </button>
-            
+
             <h3 className="text-2xl font-bold text-white mb-6 border-b border-white/5 pb-4 pr-10">
               تفاصيل طلب: {selectedApp.full_name}
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <p className="text-gray-400 text-sm mb-1">الاسم الكامل</p>
@@ -664,9 +678,9 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-2">
                   <p className="text-white font-medium text-lg" dir="ltr">{selectedApp.whatsapp_number || "غير متوفر"}</p>
                   {selectedApp.whatsapp_number && (
-                    <a 
-                      href={`https://wa.me/${selectedApp.whatsapp_number.replace(/[^0-9]/g, '')}`} 
-                      target="_blank" 
+                    <a
+                      href={`https://wa.me/${selectedApp.whatsapp_number.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-green-500 hover:bg-green-500/10 p-2 rounded-lg transition-all"
                       title="مراسلة واتساب"
@@ -702,15 +716,15 @@ export default function AdminDashboard() {
                 <p className="text-gray-400 text-sm mb-2">الملاحظات</p>
                 <p className="text-white whitespace-pre-wrap">{selectedApp.notes || "لا توجد ملاحظات"}</p>
               </div>
+              {/* ✅ Signed URL آمن بدلاً من رابط عام */}
               {selectedApp.file_url && (
                 <div className="md:col-span-2">
-                  <a 
-                    href={selectedApp.file_url} 
-                    target="_blank" 
+                  <button
+                    onClick={() => openFile(selectedApp.file_url)}
                     className="btn-primary w-full flex items-center justify-center gap-2 !py-4"
                   >
                     <Layout size={20} /> عرض صورة الجواز المرفقة
-                  </a>
+                  </button>
                 </div>
               )}
             </div>

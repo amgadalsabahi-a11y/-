@@ -1,15 +1,45 @@
+// ============================================================
+// src/app/api/admin/login/route.ts
+// إضافة: bcrypt + Rate Limiting
+// ============================================================
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { createToken } from "@/lib/auth";
-
-// ✅ إصلاح أمني: حذفنا بيانات الدخول الثابتة من الكود تماماً
-// الآن يعتمد فقط على قاعدة البيانات أو متغيرات البيئة في .env
+import { checkRateLimit } from "@/lib/security";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email: rawEmail, password: rawPassword } = await req.json();
-    const email = rawEmail?.trim();
-    const password = rawPassword?.trim();
+    // --- Rate Limiting: 5 محاولات كل 15 دقيقة لكل IP ---
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+      req.headers.get("x-real-ip") ??
+      "unknown";
+
+    const rateCheck = checkRateLimit(
+      `login:${ip}`,
+      5,
+      15 * 60 * 1000 // 15 دقيقة
+    );
+
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: `محاولات كثيرة جداً. حاول مرة أخرى بعد ${rateCheck.retryAfterSeconds} ثانية`,
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(rateCheck.retryAfterSeconds),
+          },
+        }
+      );
+    }
+
+    // --- استلام البيانات ---
+    const body = await req.json();
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const password = typeof body.password === "string" ? body.password.trim() : "";
 
     if (!email || !password) {
       return NextResponse.json(
@@ -18,10 +48,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // تحقق أولي من طول البيانات لمنع هجمات الـ DoS
+    if (email.length > 200 || password.length > 200) {
+      return NextResponse.json(
+        { error: "بيانات غير صحيحة" },
+        { status: 400 }
+      );
+    }
+
     let adminName = "";
     let authenticated = false;
 
-    // المحاولة الأولى: من قاعدة البيانات
+    // --- المحاولة الأولى: من قاعدة البيانات مع bcrypt ---
     try {
       const { data: adminUser } = await supabaseAdmin
         .from("admin_users")
@@ -30,40 +68,46 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (adminUser) {
-        // ✅ إصلاح أمني مهم: يجب أن يكون password_hash مشفراً بـ bcrypt في الـ DB
-        // مؤقتاً: مقارنة مباشرة — يُنصح بتحديث DB لاستخدام bcrypt
-        // للتحديث الكامل: npm install bcryptjs && import bcrypt from 'bcryptjs'
-        // ثم: const isMatch = await bcrypt.compare(password, adminUser.password_hash);
-        if (adminUser.password_hash === password) {
+        // ✅ مقارنة آمنة باستخدام bcrypt
+        const isMatch = await bcrypt.compare(password, adminUser.password_hash);
+        if (isMatch) {
           authenticated = true;
           adminName = adminUser.name;
         }
       }
-    } catch {
-      // قاعدة البيانات غير متاحة
+    } catch (dbError) {
+      // قاعدة البيانات غير متاحة — نكمل للـ fallback
+      console.error("DB login error:", dbError);
     }
 
-    // ✅ إصلاح أمني: الـ fallback الآن من متغيرات البيئة فقط — ليس من الكود
+    // --- Fallback: من متغيرات البيئة ---
     if (!authenticated) {
       const envEmail = process.env.ADMIN_EMAIL;
       const envPassword = process.env.ADMIN_PASSWORD;
       const envName = process.env.ADMIN_NAME || "مدير النظام";
 
-      if (envEmail && envPassword && email === envEmail && password === envPassword) {
+      if (
+        envEmail &&
+        envPassword &&
+        email === envEmail.toLowerCase() &&
+        password === envPassword
+      ) {
         authenticated = true;
         adminName = envName;
       }
     }
 
+    // --- رفض مع تأخير ثابت لمنع Timing Attack ---
     if (!authenticated) {
-      // ✅ تأخير بسيط لمنع brute force (500ms)
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // تأخير ثابت بغض النظر عن سبب الرفض
+      await new Promise((resolve) => setTimeout(resolve, 800));
       return NextResponse.json(
         { error: "بيانات الدخول غير صحيحة" },
         { status: 401 }
       );
     }
 
+    // --- إنشاء التوكن وضبط الـ Cookie ---
     const token = await createToken({ email, name: adminName });
 
     const response = NextResponse.json({
