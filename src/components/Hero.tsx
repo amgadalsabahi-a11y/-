@@ -31,9 +31,6 @@ export default function Hero({ initialData }: { initialData: any }) {
     } catch (e) { }
   }
 
-  // استخدام الـ hook للصورة الخلفية
-  const { safeUrl } = useSafeUrl(bgImage);
-
   const displayTitle = content?.title || t.hero.title;
   const displaySubtitle = content?.subtitle || t.hero.subtitle;
   const displayDesc = content?.description || t.hero.description;
@@ -47,7 +44,7 @@ export default function Hero({ initialData }: { initialData: any }) {
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-navy-950/80 z-10" />
         <img
-          src={safeUrl || "https://images.unsplash.com/photo-1513326738677-b964603b136d?q=80&w=2000"}
+          src={bgImage || "https://images.unsplash.com/photo-1513326738677-b964603b136d?q=80&w=2000"}
           alt="Russia"
           className="w-full h-full object-cover"
         />

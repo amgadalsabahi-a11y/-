@@ -36,11 +36,6 @@ export default function About({ initialData }: { initialData: any }) {
     }
   }
 
-  // استخدام الـ hook للصور الثلاث
-  const { safeUrl: safeAboutImage } = useSafeUrl(content?.about_image);
-  const { safeUrl: safeExtra1 } = useSafeUrl(content?.extra_image_1);
-  const { safeUrl: safeExtra2 } = useSafeUrl(content?.extra_image_2);
-
   const displayTitle = content?.title || t.about.title;
   const displaySubtitle = content?.subtitle || t.about.subtitle;
   const displayDesc = content?.description || t.about.description;
@@ -83,10 +78,10 @@ export default function About({ initialData }: { initialData: any }) {
             <div className="glass-card-static p-8 md:p-10 relative overflow-hidden group min-h-[300px] md:min-h-[400px] flex items-center justify-center">
               <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/10 to-brand-red/10 group-hover:scale-105 transition-transform duration-500" />
 
-              {safeAboutImage ? (
+              {content?.about_image ? (
                 <div className="absolute inset-0 z-10 w-full h-full p-4">
                   <div className="w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                    <img src={safeAboutImage} alt="About Us" className="w-full h-full object-cover" />
+                    <img src={content.about_image} alt="About Us" className="w-full h-full object-cover" />
                   </div>
                 </div>
               ) : (
@@ -114,21 +109,21 @@ export default function About({ initialData }: { initialData: any }) {
         </div>
 
         {/* ✅ الصور الإضافية - مكتملة مش جوا كرت */}
-        {(safeExtra1 || safeExtra2) && (
+        {(content?.extra_image_1 || content?.extra_image_2) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 mt-12 md:mt-20">
-            {safeExtra1 && (
+            {content?.extra_image_1 && (
               <div className="w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/5 group">
                 <img 
-                  src={safeExtra1} 
+                  src={content.extra_image_1} 
                   alt="Extra About 1" 
                   className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" 
                 />
               </div>
             )}
-            {safeExtra2 && (
+            {content?.extra_image_2 && (
               <div className="w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/5 group">
                 <img 
-                  src={safeExtra2} 
+                  src={content.extra_image_2} 
                   alt="Extra About 2" 
                   className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" 
                 />
