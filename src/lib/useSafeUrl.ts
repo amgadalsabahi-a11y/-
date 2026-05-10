@@ -15,8 +15,8 @@ export function useSafeUrl(url: string | null) {
       return;
     }
 
-    // إذا كان الرابط ليس من Supabase (مثلاً Unsplash)، نستخدمه مباشرة
-    if (!url.includes("supabase.co")) {
+    // إذا كان الرابط ليس من Supabase، أو كان في مجلد عام (مثل public_assets)، نستخدمه مباشرة
+    if (!url.includes("supabase.co") || url.includes("/public_assets/")) {
       setSafeUrl(url);
       return;
     }

@@ -75,16 +75,17 @@ export default function About({ initialData }: { initialData: any }) {
 
           {/* الصورة — order-2 على كل الشاشات */}
           <div className="order-2">
-            <div className="glass-card-static p-8 md:p-10 relative overflow-hidden group min-h-[300px] md:min-h-[400px] flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/10 to-brand-red/10 group-hover:scale-105 transition-transform duration-500" />
-
-              {content?.about_image ? (
-                <div className="absolute inset-0 z-10 w-full h-full p-4">
-                  <div className="w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                    <img src={content.about_image} alt="About Us" className="w-full h-full object-cover" />
-                  </div>
-                </div>
-              ) : (
+            {content?.about_image ? (
+              <div className="w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/5 group">
+                <img 
+                  src={content.about_image} 
+                  alt="About Us" 
+                  className="w-full h-auto md:min-h-[400px] object-cover group-hover:scale-105 transition-transform duration-700" 
+                />
+              </div>
+            ) : (
+              <div className="glass-card-static p-8 md:p-10 relative overflow-hidden group min-h-[300px] md:min-h-[400px] flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-br from-brand-blue/10 to-brand-red/10 group-hover:scale-105 transition-transform duration-500" />
                 <div className="relative z-10 flex flex-col items-center justify-center text-center">
                   <div className="w-24 h-24 rounded-full bg-gradient-to-br from-brand-blue to-brand-red flex items-center justify-center mb-6 shadow-xl shadow-brand-blue/20">
                     <div className="w-12 h-10 rounded-sm overflow-hidden flex flex-col shadow-lg border border-white/10">
@@ -102,8 +103,8 @@ export default function About({ initialData }: { initialData: any }) {
                       : "We guarantee you the best experience to reach Russia easily and safely."}
                   </p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
         </div>
