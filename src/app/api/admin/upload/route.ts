@@ -1,11 +1,25 @@
 // ============================================================
 // src/app/api/admin/upload/route.ts
-// إضافة: فحص نوع الملف بالـ Magic Bytes
+// إضافة: فحص نوع الملف بالـ Magic Bytes + الرفع لـ public_assets
 // ============================================================
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { detectMimeType } from "@/lib/security";
 import { v4 as uuidv4 } from "uuid";
+import { jwtVerify } from "jose";
+
+const getJwtSecret = () => new TextEncoder().encode(process.env.JWT_SECRET);
+
+async function verifyAdminAuth(req: NextRequest) {
+  const token = req.cookies.get("admin_token")?.value;
+  if (!token) return false;
+  try {
+    await jwtVerify(token, getJwtSecret());
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 // أنواع الملفات المسموحة في رفع الأدمن
 const ALLOWED_ADMIN_MIMES = [
@@ -17,6 +31,10 @@ const ALLOWED_ADMIN_MIMES = [
 ];
 
 export async function POST(req: NextRequest) {
+  if (!(await verifyAdminAuth(req))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;
@@ -57,7 +75,7 @@ export async function POST(req: NextRequest) {
     const fileName = `admin-uploads/${uuidv4()}.${detectedType.ext}`;
 
     const { error } = await supabaseAdmin.storage
-      .from("applications")
+      .from("public_assets") // ✅ التعديل هنا: استخدام المجلد العام
       .upload(fileName, buffer, {
         contentType: detectedType.mime,
         upsert: true,
@@ -71,9 +89,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ملاحظة: بعد تفعيل private bucket، غير إلى createSignedUrl
     const { data: publicUrlData } = supabaseAdmin.storage
-      .from("applications")
+      .from("public_assets") // ✅ التعديل هنا: جلب الرابط من المجلد العام
       .getPublicUrl(fileName);
 
     return NextResponse.json({ url: publicUrlData.publicUrl });

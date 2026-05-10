@@ -4,8 +4,26 @@
 // ============================================================
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { jwtVerify } from "jose";
+
+const getJwtSecret = () => new TextEncoder().encode(process.env.JWT_SECRET);
+
+async function verifyAdminAuth(req: NextRequest) {
+  const token = req.cookies.get("admin_token")?.value;
+  if (!token) return false;
+  try {
+    await jwtVerify(token, getJwtSecret());
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export async function GET(req: NextRequest) {
+    if (!(await verifyAdminAuth(req))) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     try {
         const fileUrl = req.nextUrl.searchParams.get("url");
 
@@ -27,6 +45,12 @@ export async function GET(req: NextRequest) {
             filePath = fileUrl.split(markerPrivate)[1].split("?")[0];
         } else {
             return NextResponse.json({ error: "رابط غير صحيح" }, { status: 400 });
+        }
+
+        // 🚨 Fix: منع ثغرة Path Traversal (SSRF)
+        // التأكد من أن المسار لا يحتوي على ../ أو الرجوع للخلف للوصول لـ Buckets أخرى
+        if (filePath.includes("../") || filePath.includes("..\\")) {
+            return NextResponse.json({ error: "مسار ملف غير آمن" }, { status: 400 });
         }
 
         // توليد رابط مؤقت صالح لمدة ساعة واحدة
