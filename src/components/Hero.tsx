@@ -1,45 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useLocale } from "./LocaleProvider";
 import { getTranslations } from "@/lib/i18n";
 import Link from "next/link";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { useSafeUrl } from "@/lib/useSafeUrl";
 
-export default function Hero() {
+export default function Hero({ initialData }: { initialData: any }) {
   const { locale } = useLocale();
   const t = getTranslations(locale);
-  const [bgImage, setBgImage] = useState<string | null>(null);
-  const [content, setContent] = useState<any>(null);
+  
+  let content: any = null;
+  let bgImage: string | null = null;
+  
+  if (initialData) {
+    try {
+      const parsed = JSON.parse(locale === "ar" ? initialData.about_ar : initialData.about_en);
+      content = {
+        title: parsed.hero_title,
+        subtitle: parsed.hero_subtitle,
+        description: parsed.hero_description,
+        cta: parsed.hero_cta,
+        title_color: parsed.hero_title_color,
+        subtitle_color: parsed.hero_subtitle_color,
+        description_color: parsed.hero_description_color
+      };
+      if (parsed.hero_image) {
+        bgImage = parsed.hero_image;
+      }
+    } catch (e) { }
+  }
 
   // استخدام الـ hook للصورة الخلفية
   const { safeUrl } = useSafeUrl(bgImage);
-
-  useEffect(() => {
-    fetch("/api/admin/content?type=settings", { next: { revalidate: 300 } } as any)
-      .then(res => res.json())
-      .then(({ data }) => {
-        if (data) {
-          try {
-            const parsed = JSON.parse(locale === "ar" ? data.about_ar : data.about_en);
-            setContent({
-              title: parsed.hero_title,
-              subtitle: parsed.hero_subtitle,
-              description: parsed.hero_description,
-              cta: parsed.hero_cta,
-              title_color: parsed.hero_title_color,
-              subtitle_color: parsed.hero_subtitle_color,
-              description_color: parsed.hero_description_color
-            });
-            if (parsed.hero_image) {
-              setBgImage(parsed.hero_image);
-            }
-          } catch (e) { }
-        }
-      })
-      .catch(() => { });
-  }, [locale]);
 
   const displayTitle = content?.title || t.hero.title;
   const displaySubtitle = content?.subtitle || t.hero.subtitle;

@@ -1,54 +1,45 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useLocale } from "./LocaleProvider";
 import { getTranslations } from "@/lib/i18n";
 import { CheckCircle2 } from "lucide-react";
 import { useSafeUrl } from "@/lib/useSafeUrl";
 
-export default function About() {
+export default function About({ initialData }: { initialData: any }) {
   const { locale } = useLocale();
   const t = getTranslations(locale);
-  const [content, setContent] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  
+  let content: any = null;
+
+  if (initialData) {
+    try {
+      const parsedAr = JSON.parse(initialData.about_ar);
+      const parsedEn = JSON.parse(initialData.about_en);
+      const current = locale === "ar" ? parsedAr : parsedEn;
+      content = {
+        title: current.about_title || current.title,
+        subtitle: current.about_subtitle || current.subtitle,
+        description: current.about_description || current.description,
+        features: current.features || "",
+        about_image: current.about_image || "",
+        extra_image_1: current.extra_image_1 || "",
+        extra_image_2: current.extra_image_2 || ""
+      };
+    } catch (e) {
+      content = {
+        title: t.about.title,
+        subtitle: t.about.subtitle,
+        description: locale === "ar" ? initialData.about_ar : initialData.about_en,
+        features: t.about.features.join("\n"),
+        about_image: ""
+      };
+    }
+  }
 
   // استخدام الـ hook للصور الثلاث
   const { safeUrl: safeAboutImage } = useSafeUrl(content?.about_image);
   const { safeUrl: safeExtra1 } = useSafeUrl(content?.extra_image_1);
   const { safeUrl: safeExtra2 } = useSafeUrl(content?.extra_image_2);
-
-  useEffect(() => {
-    fetch("/api/admin/content?type=settings", { next: { revalidate: 300 } } as any)
-      .then(res => res.json())
-      .then(({ data }) => {
-        if (data) {
-          try {
-            const parsedAr = JSON.parse(data.about_ar);
-            const parsedEn = JSON.parse(data.about_en);
-            const current = locale === "ar" ? parsedAr : parsedEn;
-            setContent({
-              title: current.about_title || current.title,
-              subtitle: current.about_subtitle || current.subtitle,
-              description: current.about_description || current.description,
-              features: current.features || "",
-              about_image: current.about_image || "",
-              extra_image_1: current.extra_image_1 || "",
-              extra_image_2: current.extra_image_2 || ""
-            });
-          } catch (e) {
-            setContent({
-              title: t.about.title,
-              subtitle: t.about.subtitle,
-              description: locale === "ar" ? data.about_ar : data.about_en,
-              features: t.about.features.join("\n"),
-              about_image: ""
-            });
-          }
-        }
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [locale]);
 
   const displayTitle = content?.title || t.about.title;
   const displaySubtitle = content?.subtitle || t.about.subtitle;
@@ -56,24 +47,6 @@ export default function About() {
   const featuresList = content?.features
     ? content.features.split("\n").filter((f: string) => f.trim() !== "")
     : t.about.features;
-
-  // ✅ Skeleton loader أثناء التحميل
-  if (loading) {
-    return (
-      <section id="about" className="relative py-16 md:py-24">
-        <div className="section-container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div className="space-y-4">
-              <div className="h-10 w-3/4 bg-white/5 rounded-xl animate-pulse" />
-              <div className="h-6 w-1/2 bg-white/5 rounded-xl animate-pulse" />
-              <div className="h-24 bg-white/5 rounded-xl animate-pulse" />
-            </div>
-            <div className="h-[400px] bg-white/5 rounded-2xl animate-pulse" />
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section id="about" className="relative py-16 md:py-24 overflow-hidden">

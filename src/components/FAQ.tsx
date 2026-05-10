@@ -1,30 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocale } from "./LocaleProvider";
 import { getTranslations } from "@/lib/i18n";
 import { ChevronDown } from "lucide-react";
 
-export default function FAQ() {
+export default function FAQ({ initialData = [] }: { initialData: any[] }) {
   const { locale } = useLocale();
   const t = getTranslations(locale);
-  const [faqs, setFaqs] = useState<any[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/admin/content?type=faqs", { next: { revalidate: 300 } } as any)
-      .then(res => res.json())
-      .then(({ data }) => {
-        if (data && data.length > 0) setFaqs(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
 
   // ✅ إصلاح: fallback للبيانات الثابتة إذا كانت قاعدة البيانات فارغة
-  const displayFaqs = faqs.length > 0
-    ? faqs
+  const displayFaqs = initialData.length > 0
+    ? initialData
     : (t as any).faq?.items || [];
 
   return (
@@ -42,14 +30,7 @@ export default function FAQ() {
           </p>
         </div>
 
-        {/* ✅ Skeleton loader أثناء التحميل */}
-        {loading ? (
-          <div className="max-w-4xl mx-auto space-y-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-20 bg-white/5 rounded-2xl animate-pulse" />
-            ))}
-          </div>
-        ) : displayFaqs.length === 0 ? (
+        {displayFaqs.length === 0 ? (
           <p className="text-center text-gray-500">{locale === "ar" ? "لا توجد أسئلة حتى الآن" : "No FAQs yet"}</p>
         ) : (
           <div className="max-w-4xl mx-auto space-y-4">
