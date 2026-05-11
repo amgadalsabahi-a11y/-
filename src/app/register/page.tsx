@@ -49,11 +49,14 @@ const dialCodes = [
   { name: "China", code: "+86", flag: "🇨🇳" }
 ];
 
+import { createWorker } from "tesseract.js";
+
 export default function Register() {
   const router = useRouter();
   const { locale } = useLocale();
   const t = getTranslations(locale);
   const [loading, setLoading] = useState(false);
+  const [isDetecting, setIsDetecting] = useState(false); // ✅ حالة فحص الجواز
   const [errorMsg, setErrorMsg] = useState("");
 
   const [form, setForm] = useState({
@@ -80,21 +83,67 @@ export default function Register() {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // ✅ وظيفة فحص الجواز بالذكاء الاصطناعي
+  const validatePassportImage = async (imageFile: File) => {
+    setIsDetecting(true);
+    setErrorMsg("");
+    try {
+      const worker = await createWorker('eng+ara');
+      const { data: { text } } = await worker.recognize(imageFile);
+      await worker.terminate();
+
+      // البحث عن علامات الجواز العالمية: P< أو كلمة Passport
+      const lowerText = text.toUpperCase();
+      const hasPassportMarks = 
+        lowerText.includes("P<") || 
+        lowerText.includes("PASSPORT") || 
+        lowerText.includes("جواز") || 
+        lowerText.includes("سفر") ||
+        lowerText.includes("<<<<");
+
+      if (!hasPassportMarks) {
+        setErrorMsg(locale === "ar" 
+          ? "عذراً، لم نكتشف ملامح جواز سفر في هذه الصورة. يرجى رفع صورة واضحة جداً لصفحة المعلومات." 
+          : "Sorry, no passport features detected. Please upload a clear photo of the data page.");
+        setFile(null);
+        setFileName("");
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error("OCR Error:", err);
+      // في حال فشل الـ OCR لسبب تقني، لا نعطل المستخدم ولكن نحذره
+      return true; 
+    } finally {
+      setIsDetecting(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       if (selectedFile.size > 10 * 1024 * 1024) {
         setErrorMsg(locale === "ar" ? "حجم الملف كبير جداً (الأقصى 10 ميجابايت)" : "File too large (Max 10MB)");
         return;
       }
-      const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/heic", "application/pdf"];
-      if (!allowedTypes.includes(selectedFile.type) && !selectedFile.name.match(/\.(jpg|jpeg|png|webp|heic|pdf)$/i)) {
+      
+      const allowedImages = ["image/jpeg", "image/png", "image/webp"];
+      const isImage = allowedImages.includes(selectedFile.type) || selectedFile.name.match(/\.(jpg|jpeg|png|webp)$/i);
+      const isPdf = selectedFile.type === "application/pdf" || selectedFile.name.endsWith(".pdf");
+
+      if (!isImage && !isPdf) {
         setErrorMsg(locale === "ar" ? "يُسمح فقط بصور (JPG, PNG, WEBP) أو PDF" : "Only images (JPG, PNG, WEBP) or PDF allowed");
         return;
       }
+
       setFile(selectedFile);
       setFileName(selectedFile.name);
       setErrorMsg("");
+
+      // إذا كانت صورة، نقوم بفحصها
+      if (isImage) {
+        await validatePassportImage(selectedFile);
+      }
     }
   };
 
@@ -391,15 +440,31 @@ export default function Register() {
                 <label className="block text-gray-300 font-semibold mb-2">
                   {locale === "ar" ? "جواز السفر *" : "Passport *"}
                 </label>
-                <label className="glass-input flex flex-col items-center justify-center gap-3 px-5 py-8 md:py-10 cursor-pointer hover:bg-white/10 transition-colors text-center border-2 border-dashed">
-                  <Upload size={32} className="text-brand-blue" />
-                  <span className="text-gray-400 font-medium text-base md:text-lg px-2 text-balance">
-                    {fileName || (locale === "ar" ? "اضغط لرفع صورة جواز السفر" : "Click to upload passport")}
-                  </span>
-                  <span className="text-gray-500 text-sm">
-                    {locale === "ar" ? "JPG، PNG، PDF — بحد أقصى 10 ميجابايت" : "JPG, PNG, PDF — Max 10MB"}
-                  </span>
-                  <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} />
+                <label className={`glass-input flex flex-col items-center justify-center gap-3 px-5 py-8 md:py-10 cursor-pointer hover:bg-white/10 transition-colors text-center border-2 border-dashed ${isDetecting ? "opacity-70 pointer-events-none" : ""}`}>
+                  {isDetecting ? (
+                    <>
+                      <div className="relative">
+                        <div className="w-12 h-12 border-4 border-brand-blue/20 border-t-brand-blue rounded-full animate-spin"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Upload size={16} className="text-brand-blue" />
+                        </div>
+                      </div>
+                      <span className="text-brand-blue font-bold animate-pulse">
+                        {locale === "ar" ? "جاري فحص الجواز ذكياً..." : "AI Passport Detection in progress..."}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={32} className="text-brand-blue" />
+                      <span className="text-gray-400 font-medium text-base md:text-lg px-2 text-balance">
+                        {fileName || (locale === "ar" ? "اضغط لرفع صورة جواز السفر" : "Click to upload passport")}
+                      </span>
+                      <span className="text-gray-500 text-sm">
+                        {locale === "ar" ? "JPG، PNG، PDF — بحد أقصى 10 ميجابايت" : "JPG, PNG, PDF — Max 10MB"}
+                      </span>
+                    </>
+                  )}
+                  <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} disabled={isDetecting} />
                 </label>
                 <p className="mt-3 text-brand-red text-sm font-medium flex items-center gap-2">
                   <AlertCircle size={16} />
@@ -423,7 +488,7 @@ export default function Register() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || isDetecting}
                 className="btn-primary w-full !py-5 !text-xl disabled:opacity-50 disabled:cursor-not-allowed mt-4"
               >
                 {loading ? (
@@ -433,6 +498,11 @@ export default function Register() {
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                     <span>{t.register.submitting}</span>
+                  </div>
+                ) : isDetecting ? (
+                  <div className="flex items-center justify-center gap-3">
+                    <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    <span>{locale === "ar" ? "جاري التأكد من الجواز..." : "Verifying Passport..."}</span>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center gap-3">
