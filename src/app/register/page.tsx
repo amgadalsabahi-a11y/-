@@ -74,6 +74,7 @@ export default function Register() {
   const [whatsappDialCode, setWhatsappDialCode] = useState("+966");
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("");
+  const [passportError, setPassportError] = useState(""); // ✅ حالة خطأ اكتشاف الجواز المخصصة
 
   const BackArrow = locale === "ar" ? ArrowRight : ArrowLeft;
   const ForwardArrow = locale === "ar" ? ArrowLeft : ArrowRight;
@@ -87,6 +88,7 @@ export default function Register() {
   const validatePassportImage = async (imageFile: File) => {
     setIsDetecting(true);
     setErrorMsg("");
+    setPassportError("");
     try {
       const worker = await createWorker('eng+ara');
       const { data: { text } } = await worker.recognize(imageFile);
@@ -102,9 +104,8 @@ export default function Register() {
         lowerText.includes("<<<<");
 
       if (!hasPassportMarks) {
-        setErrorMsg(locale === "ar" 
-          ? "عذراً، لم نكتشف ملامح جواز سفر في هذه الصورة. يرجى رفع صورة واضحة جداً لصفحة المعلومات." 
-          : "Sorry, no passport features detected. Please upload a clear photo of the data page.");
+        const errorText = (t.register as any).passportDetectionError;
+        setPassportError(errorText);
         setFile(null);
         setFileName("");
         return false;
@@ -122,6 +123,7 @@ export default function Register() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      setPassportError("");
       if (selectedFile.size > 10 * 1024 * 1024) {
         setErrorMsg(locale === "ar" ? "حجم الملف كبير جداً (الأقصى 10 ميجابايت)" : "File too large (Max 10MB)");
         return;
@@ -466,6 +468,14 @@ export default function Register() {
                   )}
                   <input type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} disabled={isDetecting} />
                 </label>
+                
+                {passportError && (
+                  <div className="mt-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3 animate-shake">
+                    <AlertCircle size={20} className="text-red-400 shrink-0 mt-0.5" />
+                    <p className="text-red-200 text-sm font-bold">{passportError}</p>
+                  </div>
+                )}
+
                 <p className="mt-3 text-brand-red text-sm font-medium flex items-center gap-2">
                   <AlertCircle size={16} />
                   {(t.register as any).passportWarning}

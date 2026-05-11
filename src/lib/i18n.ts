@@ -61,7 +61,7 @@ export const translations = {
       steps: [
         { number: "01", title: "سجّل طلبك", description: "أملأ نموذج التسجيل بمعلوماتك الأساسية والخدمة المطلوبة" },
         { number: "02", title: "نراجع طلبك", description: "فريقنا المتخصص يراجع طلبك ويحدد أفضل الخيارات المتاحة لك" },
-        { number: "03", title: "نتواصل معك", description: "نتواصل معك خلال 24 ساعة لبدء تنفيذ الخطة المناسبة" },
+        { number: "03", title: "نتواصل معك", description: "نتواصل معك لبدء تنفيذ الخطة المناسبة" },
       ],
     },
     // FAQ
@@ -102,6 +102,7 @@ export const translations = {
       error: "حدث خطأ. يرجى المحاولة مرة أخرى.",
       duplicateWarning: "تحذير: يرجى عدم تقديم أكثر من طلب واحد. تقديم طلبات متكررة سيؤدي إلى رفض طلبك تماماً ولن يتم التواصل معك.",
       passportWarning: "ملاحظة: في حال كانت صورة الجواز غير واضحة أو غير مكتملة، سيتم رفض الطلب تلقائياً.",
+      passportDetectionError: "عذراً، لم نكتشف ملامح جواز سفر في هذه الصورة. يرجى رفع صورة واضحة جداً لصفحة المعلومات.",
       residencyValid: "هل إقامتك سارية؟",
       required: "هذا الحقل مطلوب",
     },
@@ -192,7 +193,7 @@ export const translations = {
       steps: [
         { number: "01", title: "Submit Your Request", description: "Fill out the registration form with your basic information and desired service" },
         { number: "02", title: "We Review", description: "Our specialized team reviews your request and determines the best available options" },
-        { number: "03", title: "We Contact You", description: "We contact you within 24 hours to start implementing the appropriate plan" },
+        { number: "03", title: "We Contact You", description: "We contact you to start implementing the appropriate plan" },
       ],
     },
     faq: {
@@ -230,6 +231,7 @@ export const translations = {
       error: "An error occurred. Please try again.",
       duplicateWarning: "Warning: Please do not submit more than one application. Repeated submissions will lead to immediate rejection and no communication.",
       passportWarning: "Note: If the passport image is unclear or incomplete, the application will be rejected automatically.",
+      passportDetectionError: "Sorry, no passport features detected. Please upload a clear photo of the data page.",
       residencyValid: "Is your residency valid?",
       required: "This field is required",
     },
