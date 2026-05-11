@@ -15,18 +15,21 @@ export default function Hero({ initialData }: { initialData: any }) {
   
   if (initialData) {
     try {
-      const parsed = JSON.parse(locale === "ar" ? initialData.about_ar : initialData.about_en);
-      content = {
-        title: parsed.hero_title,
-        subtitle: parsed.hero_subtitle,
-        description: parsed.hero_description,
-        cta: parsed.hero_cta,
-        title_color: parsed.hero_title_color,
-        subtitle_color: parsed.hero_subtitle_color,
-        description_color: parsed.hero_description_color
-      };
-      if (parsed.hero_image) {
-        bgImage = parsed.hero_image;
+      const heroData = locale === "ar" ? initialData.hero_ar : initialData.hero_en;
+      if (heroData) {
+        const parsed = JSON.parse(heroData);
+        content = {
+          title: parsed.title,
+          subtitle: parsed.subtitle,
+          description: parsed.description,
+          cta: parsed.cta,
+          title_color: parsed.title_color,
+          subtitle_color: parsed.subtitle_color,
+          description_color: parsed.description_color
+        };
+        if (parsed.image) {
+          bgImage = parsed.image;
+        }
       }
     } catch (e) { }
   }

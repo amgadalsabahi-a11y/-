@@ -73,23 +73,48 @@ export default function AdminDashboard() {
       const res = await fetch(`/api/admin/content?type=${type}&t=${Date.now()}`);
       const { data } = await res.json();
       if (type === "settings" && data) {
-        const ar = JSON.parse(data.about_ar || "{}");
-        const en = JSON.parse(data.about_en || "{}");
+        const arAbout = JSON.parse(data.about_ar || "{}");
+        const enAbout = JSON.parse(data.about_en || "{}");
+        const arHero = JSON.parse(data.hero_ar || "{}");
+        const enHero = JSON.parse(data.hero_en || "{}");
+
         setHeroAr({
-          title: ar.hero_title || "", subtitle: ar.hero_subtitle || "", description: ar.hero_description || "", cta: ar.hero_cta || "", image: ar.hero_image || "",
-          title_color: ar.hero_title_color || "#ffffff", subtitle_color: ar.hero_subtitle_color || "#1e50a2", description_color: ar.hero_description_color || "#d1d5db"
+          title: arHero.title || "", 
+          subtitle: arHero.subtitle || "", 
+          description: arHero.description || "", 
+          cta: arHero.cta || "", 
+          image: arHero.image || "",
+          title_color: arHero.title_color || "#ffffff", 
+          subtitle_color: arHero.subtitle_color || "#1e50a2", 
+          description_color: arHero.description_color || "#d1d5db"
         });
         setHeroEn({
-          title: en.hero_title || "", subtitle: en.hero_subtitle || "", description: en.hero_description || "", cta: en.hero_cta || "", image: en.hero_image || "",
-          title_color: en.hero_title_color || "#ffffff", subtitle_color: en.hero_subtitle_color || "#1e50a2", description_color: en.hero_description_color || "#d1d5db"
+          title: enHero.title || "", 
+          subtitle: enHero.subtitle || "", 
+          description: enHero.description || "", 
+          cta: enHero.cta || "", 
+          image: enHero.image || "",
+          title_color: enHero.title_color || "#ffffff", 
+          subtitle_color: enHero.subtitle_color || "#1e50a2", 
+          description_color: enHero.description_color || "#d1d5db"
         });
         setAboutAr({
-          title: ar.about_title || "", subtitle: ar.about_subtitle || "", description: ar.about_description || "", about_image: ar.about_image || "", features: ar.features || "",
-          extra_image_1: ar.extra_image_1 || "", extra_image_2: ar.extra_image_2 || ""
+          title: arAbout.about_title || arAbout.title || "", 
+          subtitle: arAbout.about_subtitle || arAbout.subtitle || "", 
+          description: arAbout.about_description || arAbout.description || "", 
+          about_image: arAbout.about_image || "", 
+          features: arAbout.features || "",
+          extra_image_1: arAbout.extra_image_1 || "", 
+          extra_image_2: arAbout.extra_image_2 || ""
         });
         setAboutEn({
-          title: en.about_title || "", subtitle: en.about_subtitle || "", description: en.about_description || "", about_image: en.about_image || "", features: en.features || "",
-          extra_image_1: en.extra_image_1 || "", extra_image_2: en.extra_image_2 || ""
+          title: enAbout.about_title || enAbout.title || "", 
+          subtitle: enAbout.about_subtitle || enAbout.subtitle || "", 
+          description: enAbout.about_description || enAbout.description || "", 
+          about_image: enAbout.about_image || "", 
+          features: enAbout.features || "",
+          extra_image_1: enAbout.extra_image_1 || "", 
+          extra_image_2: enAbout.extra_image_2 || ""
         });
       } else if (type === "faqs") {
         setFaqs(data || []);
@@ -118,15 +143,19 @@ export default function AdminDashboard() {
 
   const saveSettings = async () => {
     const payload = {
+      hero_ar: JSON.stringify({
+        title: heroAr.title, subtitle: heroAr.subtitle, description: heroAr.description, cta: heroAr.cta, image: heroAr.image,
+        title_color: heroAr.title_color, subtitle_color: heroAr.subtitle_color, description_color: heroAr.description_color
+      }),
+      hero_en: JSON.stringify({
+        title: heroEn.title, subtitle: heroEn.subtitle, description: heroEn.description, cta: heroEn.cta, image: heroEn.image,
+        title_color: heroEn.title_color, subtitle_color: heroEn.subtitle_color, description_color: heroEn.description_color
+      }),
       about_ar: JSON.stringify({
-        hero_title: heroAr.title, hero_subtitle: heroAr.subtitle, hero_description: heroAr.description, hero_cta: heroAr.cta, hero_image: heroAr.image,
-        hero_title_color: heroAr.title_color, hero_subtitle_color: heroAr.subtitle_color, hero_description_color: heroAr.description_color,
         about_title: aboutAr.title, about_subtitle: aboutAr.subtitle, about_description: aboutAr.description, about_image: aboutAr.about_image, features: aboutAr.features,
         extra_image_1: aboutAr.extra_image_1, extra_image_2: aboutAr.extra_image_2
       }),
       about_en: JSON.stringify({
-        hero_title: heroEn.title, hero_subtitle: heroEn.subtitle, hero_description: heroEn.description, hero_cta: heroEn.cta, hero_image: heroEn.image,
-        hero_title_color: heroEn.title_color, hero_subtitle_color: heroEn.subtitle_color, hero_description_color: heroEn.description_color,
         about_title: aboutEn.title, about_subtitle: aboutEn.subtitle, about_description: aboutEn.description, about_image: aboutEn.about_image, features: aboutEn.features,
         extra_image_1: aboutEn.extra_image_1, extra_image_2: aboutEn.extra_image_2
       })
