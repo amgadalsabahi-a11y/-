@@ -75,28 +75,30 @@ export default function AdminDashboard() {
       if (type === "settings" && data) {
         const arAbout = JSON.parse(data.about_ar || "{}");
         const enAbout = JSON.parse(data.about_en || "{}");
-        const arHero = JSON.parse(data.hero_ar || "{}");
-        const enHero = JSON.parse(data.hero_en || "{}");
+        
+        // Fallback logic: Use hero columns if they exist, otherwise fallback to old about columns
+        const arHero = data.hero_ar ? JSON.parse(data.hero_ar) : arAbout;
+        const enHero = data.hero_en ? JSON.parse(data.hero_en) : enAbout;
 
         setHeroAr({
-          title: arHero.title || "", 
-          subtitle: arHero.subtitle || "", 
-          description: arHero.description || "", 
-          cta: arHero.cta || "", 
-          image: arHero.image || "",
-          title_color: arHero.title_color || "#ffffff", 
-          subtitle_color: arHero.subtitle_color || "#1e50a2", 
-          description_color: arHero.description_color || "#d1d5db"
+          title: arHero.title || arHero.hero_title || "", 
+          subtitle: arHero.subtitle || arHero.hero_subtitle || "", 
+          description: arHero.description || arHero.hero_description || "", 
+          cta: arHero.cta || arHero.hero_cta || "", 
+          image: arHero.image || arHero.hero_image || "",
+          title_color: arHero.title_color || arHero.hero_title_color || "#ffffff", 
+          subtitle_color: arHero.subtitle_color || arHero.hero_subtitle_color || "#1e50a2", 
+          description_color: arHero.description_color || arHero.hero_description_color || "#d1d5db"
         });
         setHeroEn({
-          title: enHero.title || "", 
-          subtitle: enHero.subtitle || "", 
-          description: enHero.description || "", 
-          cta: enHero.cta || "", 
-          image: enHero.image || "",
-          title_color: enHero.title_color || "#ffffff", 
-          subtitle_color: enHero.subtitle_color || "#1e50a2", 
-          description_color: enHero.description_color || "#d1d5db"
+          title: enHero.title || enHero.hero_title || "", 
+          subtitle: enHero.subtitle || enHero.hero_subtitle || "", 
+          description: enHero.description || enHero.hero_description || "", 
+          cta: enHero.cta || enHero.hero_cta || "", 
+          image: enHero.image || enHero.hero_image || "",
+          title_color: enHero.title_color || enHero.hero_title_color || "#ffffff", 
+          subtitle_color: enHero.subtitle_color || enHero.hero_subtitle_color || "#1e50a2", 
+          description_color: enHero.description_color || enHero.hero_description_color || "#d1d5db"
         });
         setAboutAr({
           title: arAbout.about_title || arAbout.title || "", 

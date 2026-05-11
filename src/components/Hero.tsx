@@ -15,21 +15,27 @@ export default function Hero({ initialData }: { initialData: any }) {
   
   if (initialData) {
     try {
-      const heroData = locale === "ar" ? initialData.hero_ar : initialData.hero_en;
-      if (heroData) {
-        const parsed = JSON.parse(heroData);
-        content = {
-          title: parsed.title,
-          subtitle: parsed.subtitle,
-          description: parsed.description,
-          cta: parsed.cta,
-          title_color: parsed.title_color,
-          subtitle_color: parsed.subtitle_color,
-          description_color: parsed.description_color
-        };
-        if (parsed.image) {
-          bgImage = parsed.image;
-        }
+      // جلب البيانات من القسم الجديد أولاً، وإذا كان فارغاً نستخدم القسم القديم
+      const heroDataRaw = locale === "ar" ? initialData.hero_ar : initialData.hero_en;
+      const aboutDataRaw = locale === "ar" ? initialData.about_ar : initialData.about_en;
+      
+      const parsedHero = heroDataRaw ? JSON.parse(heroDataRaw) : null;
+      const parsedAbout = aboutDataRaw ? JSON.parse(aboutDataRaw) : {};
+      
+      const finalData = (parsedHero && parsedHero.title) ? parsedHero : parsedAbout;
+
+      content = {
+        title: finalData.title || finalData.hero_title,
+        subtitle: finalData.subtitle || finalData.hero_subtitle,
+        description: finalData.description || finalData.hero_description,
+        cta: finalData.cta || finalData.hero_cta,
+        title_color: finalData.title_color || finalData.hero_title_color,
+        subtitle_color: finalData.subtitle_color || finalData.hero_subtitle_color,
+        description_color: finalData.description_color || finalData.hero_description_color
+      };
+      
+      if (finalData.image || finalData.hero_image) {
+        bgImage = finalData.image || finalData.hero_image;
       }
     } catch (e) { }
   }
