@@ -40,14 +40,16 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      // السماح بـ scripts من نفس الموقع فقط
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+      // السماح بـ scripts من نفس الموقع + مكتبات AI
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com",
       // السماح بـ styles من نفس الموقع
       "style-src 'self' 'unsafe-inline'",
-      // السماح بالصور من نفس الموقع + Supabase + data URIs
+      // السماح بالصور من نفس الموقع + Supabase + data URIs + blob
       "img-src 'self' data: blob: https://*.supabase.co https://*.supabase.in",
-      // السماح بالاتصال بـ Supabase فقط
-      "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co",
+      // السماح بالاتصال بـ Supabase + خوادم بيانات اللغة للـ AI
+      "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co https://cdn.jsdelivr.net https://unpkg.com",
+      // السماح بتشغيل الـ AI Workers
+      "worker-src 'self' blob:",
       // منع تضمين الموقع في frame
       "frame-ancestors 'self'",
       // منع object/embed
